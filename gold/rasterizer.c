@@ -148,7 +148,7 @@ bool sample_test(Triangle triangle, Sample sample)
   int cross1 = x1 * y2 - x2 * y1;
   int cross2 = x2 * y0 - x0 * y2;
 
-  isHit = (cross0 <= 0 && cross1 <= 0 && cross2 <= 0);
+  isHit = (cross0 <= 0 && cross1 < 0 && cross2 <= 0);
   // END CODE HERE
 
   return isHit;
