@@ -160,7 +160,8 @@ module bbox
     //End R10 Signals
 
     // Begin output for retiming registers
-    logic signed [SIGFIG-1:0]   tri_R13S_retime[VERTS-1:0][AXIS-1:0]; // 4 Sets X,Y Fixed Point Values
+    //tri[0][0] is the x coordinate of the first vertex of the triangle, tri[0][1] is the y coordinate of the first vertex of the triangle, etc.
+    logic signed [SIGFIG-1:0]   tri_R13S_retime[VERTS-1:0][AXIS-1:0]; // 4 Sets X,Y Fixed Point Values, R means register stage and R10 is the pipeline stage, S means siged
     logic unsigned [SIGFIG-1:0] color_R13U_retime[COLORS-1:0];        // Color of Tri
     logic signed [SIGFIG-1:0]   box_R13S_retime[1:0][1:0];             // 2 Sets X,Y Fixed Point Values
     logic                           validTri_R13H_retime ;                 // Valid Data for Operation
