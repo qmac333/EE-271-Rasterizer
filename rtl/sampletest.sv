@@ -93,7 +93,7 @@ module sampletest
 
     // Signals in Access Order
     logic signed [SIGFIG-1:0]       tri_shift_R16S[VERTS-1:0][1:0]; // triangle after coordinate shift
-    logic signed [SIGFIG-1:0]       edge_R16S[EDGES-1:0][1:0][1:0]; // Edges
+    logic signed [SIGFIG-1:0]       edge_R16S[EDGES-1:0][1:0][1:0]; // Edges, first index is edge, second index is starting vertex or ending vertex, third index is x or y
     logic signed [(2*SHORTSF)-1:0]  dist_lg_R16S[EDGES-1:0]; // Result of x_1 * y_2 - x_2 * y_1
     logic                           hit_valid_R16H ; // Output (YOUR JOB!)
     logic signed [SIGFIG-1:0]       hit_R16S[AXIS-1:0]; // Sample position
@@ -104,10 +104,32 @@ module sampletest
     // Consider the following steps:
 
     // START CODE HERE
-    // (1) Shift X, Y coordinates such that the fragment resides on the (0,0) position.
     // (2) Organize edges (form three edges for triangles)
-    // (3) Calculate distance x_1 * y_2 - x_2 * y_1
-    // (4) Check distance and assign hit_valid_R16H.
+    always_comb begin
+        // (1) Shift X, Y coordinates such that the fragment resides on the (0,0) position.
+        tri_shift_R16S[0][0] = tri_R16S[0][0] - sample_R16S[0];
+        tri_shift_R16S[0][1] = tri_R16S[0][1] - sample_R16S[1];
+        tri_shift_R16S[1][0] = tri_R16S[1][0] - sample_R16S[0];
+        tri_shift_R16S[1][1] = tri_R16S[1][1] - sample_R16S[1];
+        tri_shift_R16S[2][0] = tri_R16S[2][0] - sample_R16S[0];
+        tri_shift_R16S[2][1] = tri_R16S[2][1] - sample_R16S[1];
+
+        // (3) Calculate distance x_1 * y_2 - x_2 * y_1
+        dist_lg_R16S[0] = (tri_shift_R16S[0][0] * tri_shift_R16S[1][1]) - (tri_shift_R16S[1][0] * tri_shift_R16S[0][1]);
+        dist_lg_R16S[1] = (tri_shift_R16S[1][0] * tri_shift_R16S[2][1]) - (tri_shift_R16S[2][0] * tri_shift_R16S[1][1]);
+        dist_lg_R16S[2] = (tri_shift_R16S[2][0] * tri_shift_R16S[0][1]) - (tri_shift_R16S[0][0] * tri_shift_R16S[2][1]);
+        
+        // (4) Check distance and assign hit_valid_R16H.
+        hit_valid_R16H = validSamp_R16H && (dist_lg_R16S[0] <= 0) && (dist_lg_R16S[1] < 0) && (dist_lg_R16S[2] <= 0);
+
+        // if (hit_valid_R16H) begin
+        //     // (5) Calculate the hit position
+        //     hit_R16S[0] = sample_R16S[0];
+        //     hit_R16S[1] = sample_R16S[1];
+        //     hit_R16S[2] = tri_R16S[0][2];
+        //     // color_R16U = color_R16U;
+        // end
+    end
     // END CODE HERE
 
     //Assertions to help debug
