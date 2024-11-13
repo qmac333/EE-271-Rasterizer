@@ -203,31 +203,35 @@ module bbox
     assert property(@(posedge clk) $onehot(bbox_sel_R10H[1][1]));
 
     //first assign the box to the first vertex
-    assign box_R13S[0][0] = tri_R10S[0][0];
-    assign box_R13S[0][1] = tri_R10S[0][1];
-    assign box_R13S[1][0] = tri_R10S[0][0];
-    assign box_R13S[1][1] = tri_R10S[0][1];
+    // assign out_box_R10S[0][0] = tri_R10S[0][0];
+    // assign out_box_R10S[0][1] = tri_R10S[0][1];
+    // assign out_box_R10S[1][0] = tri_R10S[0][0];
+    // assign out_box_R10S[1][1] = tri_R10S[0][1];
 
 
 
+    int k;
     always_comb begin
-        int i;
-        for (i=0; i<VERTS; i++) begin
+        box_R10S[0][0] = tri_R10S[0][0];
+        box_R10S[0][1] = tri_R10S[0][1];
+        box_R10S[1][0] = tri_R10S[0][0];
+        box_R10S[1][1] = tri_R10S[0][1];
+        for (k=0; k<VERTS; k++) begin
             //first set lowerleft x
-            if (box_R10S[0][0] > tri_R10S[i][0]) begin
-                box_R10S[0][0] = tri_R10S[i][0];
+            if (box_R10S[0][0] > tri_R10S[k][0]) begin
+                box_R10S[0][0] = tri_R10S[k][0];
             end
             //then set lowerleft y
-            if (box_R10S[0][1] > tri_R10S[i][1]) begin
-                box_R10S[0][1] = tri_R10S[i][1];
+            if (box_R10S[0][1] > tri_R10S[k][1]) begin
+                box_R10S[0][1] = tri_R10S[k][1];
             end
             //then set upper right x
-            if (box_R10S[1][0] < tri_R10S[i][0]) begin
-                box_R10S[1][0] = tri_R10S[i][0];
+            if (box_R10S[1][0] < tri_R10S[k][0]) begin
+                box_R10S[1][0] = tri_R10S[k][0];
             end
             //then set upper right y
-            if (box_R10S[1][1] < tri_R10S[i][1]) begin
-                box_R10S[1][1] = tri_R10S[i][1];
+            if (box_R10S[1][1] < tri_R10S[k][1]) begin
+                box_R10S[1][1] = tri_R10S[k][1];
             end
         end
     end
@@ -344,7 +348,7 @@ endgenerate
             out_box_R10S[0][0] = rounded_box_R10S[0][0];
         end
         // END CODE HERE
-        validTri_R13H = validTri_R10H && (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
+        outvalid_R10H = validTri_R10H && (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
     end
 
     //Assertion for checking if outvalid_R10H has been assigned properly

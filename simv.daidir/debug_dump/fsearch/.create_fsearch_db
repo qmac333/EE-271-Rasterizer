@@ -1,0 +1,9 @@
+#!/bin/sh -h 
+PYTHONHOME=/afs/ir.stanford.edu/class/ee/synopsys/vcs/M-2017.03/etc/search/pyh
+export PYTHONHOME
+PYTHONPATH=/afs/ir.stanford.edu/class/ee/synopsys/vcs/M-2017.03/linux64/lib/pylib27
+export PYTHONPATH
+LD_LIBRARY_PATH=/afs/ir.stanford.edu/class/ee/synopsys/vcs/M-2017.03/linux64/lib:/afs/ir.stanford.edu/class/ee/synopsys/vcs/M-2017.03/linux64/lib/pylib27
+export LD_LIBRARY_PATH
+/afs/ir.stanford.edu/class/ee/synopsys/vcs/M-2017.03/linux64/bin/vcsfind_create_index.exe  -z  "/home/users/jiajunc4/ee271/gitproj_part1/EE-271-Rasterizer/simv.daidir/debug_dump/fsearch/./idents_uVpGNg.xml.gz" -o "/home/users/jiajunc4/ee271/gitproj_part1/EE-271-Rasterizer/simv.daidir/debug_dump/fsearch/fsearch.db_tmp"
+\mv "/home/users/jiajunc4/ee271/gitproj_part1/EE-271-Rasterizer/simv.daidir/debug_dump/fsearch/fsearch.db_tmp" "/home/users/jiajunc4/ee271/gitproj_part1/EE-271-Rasterizer/simv.daidir/debug_dump/fsearch/fsearch.db"

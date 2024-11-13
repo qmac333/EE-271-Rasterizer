@@ -307,7 +307,6 @@ if(MOD_FSM == 0) begin // Using baseline FSM
                     next_halt_RnnnnL = 1'b0;
                     next_tri_R14S = tri_R13S;
                     next_color_R14U = color_R13U;
-                    if 
                 end
                 else begin
                     next_state_R14H = WAIT_STATE;
@@ -344,8 +343,8 @@ if(MOD_FSM == 0) begin // Using baseline FSM
 
     //Your assertions goes here
     // START CODE HERE
-    assert property (posedge clk) disable iff (rst) (validTri_R13H -> next_state_R14H == TEST_STATE);
-    assert property (posedge clk) disable iff (rst) (at_end_box_R14H -> ((next_state_R14H == WAIT_STATE) && (state_R14H == TEST_STATE)));
+    assert property (@(posedge clk) disable iff (rst) (validTri_R13H -> (next_state_R14H == TEST_STATE)));
+    assert property (@(posedge clk) disable iff (rst) (at_end_box_R14H -> ((next_state_R14H == WAIT_STATE) && (state_R14H == TEST_STATE))));
     // END CODE HERE
     // Assertion ends
 
@@ -364,10 +363,10 @@ if(MOD_FSM == 0) begin // Using baseline FSM
 
     //Check that Proposed Sample is in BBox
     // START CODE HERE
-    assert property (posedge clk) disable iff (rst) (rb_lt(rst, box_R14S[0][0], sample_R14S[0], at_end_box_R14H));
-    assert property (posedge clk) disable iff (rst) (rb_lt(rst, sample_R14S[0], box_R14S[1][0], at_end_box_R14H));
-    assert property (posedge clk) disable iff (rst) (rb_lt(rst, box_R14S[0][1], sample_R14S[1], at_end_box_R14H));
-    assert property (posedge clk) disable iff (rst) (rb_lt(rst, sample_R14S[1], box_R14S[1][1], at_end_box_R14H));
+    assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, box_R14S[0][0], sample_R14S[0], at_end_box_R14H)));
+    assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, sample_R14S[0], box_R14S[1][0], at_end_box_R14H)));
+    assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, box_R14S[0][1], sample_R14S[1], at_end_box_R14H)));
+    assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, sample_R14S[1], box_R14S[1][1], at_end_box_R14H)));
     // END CODE HERE
     //Check that Proposed Sample is in BBox
 
