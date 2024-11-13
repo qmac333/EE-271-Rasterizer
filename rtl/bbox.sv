@@ -185,6 +185,7 @@ module bbox
     
     //  DECLARE ANY OTHER SIGNALS YOU NEED
 
+
     // Try declaring an always_comb block to assign values to box_R10S
     // END CODE HERE
 
@@ -201,6 +202,35 @@ module bbox
     assert property(@(posedge clk) $onehot(bbox_sel_R10H[1][0]));
     assert property(@(posedge clk) $onehot(bbox_sel_R10H[1][1]));
 
+    //first assign the box to the first vertex
+    assign box_R13S[0][0] = tri_R10S[0][0];
+    assign box_R13S[0][1] = tri_R10S[0][1];
+    assign box_R13S[1][0] = tri_R10S[0][0];
+    assign box_R13S[1][1] = tri_R10S[0][1];
+
+
+
+    always_comb begin
+        int i;
+        for (i=0; i<VERTS; i++) begin
+            //first set lowerleft x
+            if (box_R10S[0][0] > tri_R10S[i][0]) begin
+                box_R10S[0][0] = tri_R10S[i][0];
+            end
+            //then set lowerleft y
+            if (box_R10S[0][1] > tri_R10S[i][1]) begin
+                box_R10S[0][1] = tri_R10S[i][1];
+            end
+            //then set upper right x
+            if (box_R10S[1][0] < tri_R10S[i][0]) begin
+                box_R10S[1][0] = tri_R10S[i][0];
+            end
+            //then set upper right y
+            if (box_R10S[1][1] < tri_R10S[i][1]) begin
+                box_R10S[1][1] = tri_R10S[i][1];
+            end
+        end
+    end
     //Assertions to check UR is never less than LL
     // END CODE HERE
 
@@ -227,19 +257,53 @@ module bbox
     //       as a bitwise and operation.
 
 //Round LowerLeft and UpperRight for X and Y
+
+//figure out the lg2 value from the subsample_RnnnnU
+logic [3:0] lg2;
+logic [SIGFIG-1:0] bits_cut;
+logic [RADIX-1:0] mask;
+always_comb begin
+    case(subSample_RnnnnU)
+        4'b1000: begin
+            //1x MSAA eq. to 1 sample per pixel
+            //no rounding needed
+            lg2 = 0;
+        end
+        4'b0100: begin
+            //4x MSAA eq to 4 samples per pixel, a sample is half a pixel on a side
+            lg2 = 1;
+        end
+        4'b0010: begin
+            //16x MSAA eq to 16 sample per pixel, a sample is a quarter pixel on a side.
+            lg2 = 2;
+        end
+        4'b0001: begin
+            //64x MSAA eq to 64 samples per pixel, a sample is an eighth of a pixel on a side.
+            lg2 = 3;
+        end
+        default: begin
+            lg2 = 0;
+        end
+    endcase
+    bits_cut = RADIX - lg2;
+    mask = ~((1 << bits_cut) - 1);
+end
+
 generate
 for(genvar i = 0; i < 2; i = i + 1) begin
     for(genvar j = 0; j < 2; j = j + 1) begin
 
         always_comb begin
+
             //Integer Portion of LL and UR Remains the Same
             rounded_box_R10S[i][j][SIGFIG-1:RADIX]
                 = box_R10S[i][j][SIGFIG-1:RADIX];
 
             //////// ASSIGN FRACTIONAL PORTION
             // START CODE HERE
+            rounded_box_R10S[i][j][RADIX-1:0]
+                = box_R10S[i][j][RADIX-1:0] & mask;
             // END CODE HERE
-
         end // always_comb
 
     end
@@ -267,8 +331,20 @@ endgenerate
 
         //////// ASSIGN "out_box_R10S" and "outvalid_R10H"
         // START CODE HERE
+        //first set the upper right corner
+        if (rounded_box_R10S[1][0] > screen_RnnnnS[0]) begin
+            out_box_R10S[1][0] = screen_RnnnnS[0];
+        end else begin
+            out_box_R10S[1][0] = rounded_box_R10S[1][0];
+        end
+        //next set the lower left corner
+        if (rounded_box_R10S[0][0] < 0) begin
+            out_box_R10S[0][0] = 0;
+        end else begin
+            out_box_R10S[0][0] = rounded_box_R10S[0][0];
+        end
         // END CODE HERE
-
+        validTri_R13H = validTri_R10H && (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
     end
 
     //Assertion for checking if outvalid_R10H has been assigned properly
