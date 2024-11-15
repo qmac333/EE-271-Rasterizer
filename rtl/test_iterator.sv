@@ -252,39 +252,54 @@ if(MOD_FSM == 0) begin // Using baseline FSM
 
     always_comb begin
         // START CODE HERE
+        at_right_edg_R14H = 1'b0;
+        at_top_edg_R14H = 1'b0;
+        at_end_box_R14H = 1'b0;
+        //starting point
+        if (state_R14H == WAIT_STATE && validTri_R13H) begin
+            next_sample_R14S[0] = box_R13S[0][0];
+            next_sample_R14S[1] = box_R13S[0][1];
+        end
         //check if at right edge
         if (sample_R14S[0] == box_R14S[1][0]) begin
-            next_up_samp_R14S[0] = box_R14S[0][0];
-            next_up_samp_R14S[1] = sample_R14S[1] + 1;
+            // next_up_samp_R14S[0] = box_R14S[0][0];
+            // next_up_samp_R14S[1] = sample_R14S[1] + 1;
+            next_sample_R14S[0] = box_R14S[0][0];
+            next_sample_R14S[1] = sample_R14S[1] + 1;
             at_right_edg_R14H = 1'b1;
             next_validSamp_R14H = 1'b1;
         end
         //check if at top edge
         else if (sample_R14S[1] == box_R14S[1][1]) begin
+            // next_rt_samp_R14S[0] = sample_R14S[0] + 1;
+            // next_rt_samp_R14S[1] = sample_R14S[1];
+            // next_up_samp_R14S[0] = sample_R14S[0] + 1;
+            // next_up_samp_R14S[1] = sample_R14S[1];
+            next_sample_R14S[0] = sample_R14S[0] + 1;
+            next_sample_R14S[1] = sample_R14S[1];
             at_top_edg_R14H = 1'b1;
-            next_rt_samp_R14S[0] = sample_R14S[0] + 1;
-            next_rt_samp_R14S[1] = sample_R14S[1];
             next_validSamp_R14H = 1'b1;
         end
         //check if at end of box
         else if (sample_R14S[0] == box_R14S[1][0] && sample_R14S[1] == box_R14S[1][1]) begin
             at_end_box_R14H = 1'b1;
-            //
             next_validSamp_R14H = 1'b0;
         end
         else begin
+            // next_rt_samp_R14S[0] = sample_R14S[0] + 1;
+            // next_rt_samp_R14S[1] = sample_R14S[1];
+            next_sample_R14S[0] = sample_R14S[0] + 1;
+            next_sample_R14S[1] = sample_R14S[1];
             at_right_edg_R14H = 1'b0;
             at_top_edg_R14H = 1'b0;
             at_end_box_R14H = 1'b0;
-            next_rt_samp_R14S[0] = sample_R14S[0] + 1;
-            next_rt_samp_R14S[1] = sample_R14S[1];
             next_validSamp_R14H = 1'b1;
         end
         if (!validTri_R13H) begin
             next_validSamp_R14H = 1'b0;
         end
-        next_sample_R14S[0] = next_rt_samp_R14S[0];
-        next_sample_R14S[1] = next_up_samp_R14S[1];
+        // next_sample_R14S[0] = next_rt_samp_R14S[0];
+        // next_sample_R14S[1] = next_up_samp_R14S[1];
         // END CODE HERE
     end
 

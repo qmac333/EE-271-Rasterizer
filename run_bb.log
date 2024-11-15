@@ -1,0 +1,35 @@
+Chronologic VCS simulator copyright 1991-2017
+Contains Synopsys proprietary information.
+Compiler version M-2017.03_Full64; Runtime version M-2017.03_Full64;  Nov 14 14:48 2024
+time=         0 ************** Driver Is Initializing Input Signals *****************
+time=         0 ************** Loading Arguments *****************
+time=         0 Starting Wave Capture
+VCD+ Writer M-2017.03_Full64 Copyright (c) 1991-2017 by Synopsys Inc.
+Simulation run with default random seed=12345
+Simulation will timout after 50000000 cycles
+Simulation will use test file /afs/ir.stanford.edu/class/ee271/project/vect/vec_271_01_sv_short.dat
+Seed=      12345 
+time=     15000 ************** Driver Is Initializing Test from File *****************
+Setting screen params: w=800 h=600 msaa=16
+time=     30000 ************** Initializing FB and ZB *****************
+time=     30010 ************** Finished Init FB and ZB *****************
+time=     45000 ************** Runnning Test *****************
+time=     45000 ************** Driver Is Runnning Test -->/afs/ir.stanford.edu/class/ee271/project/vect/vec_271_01_sv_short.dat<-- *****************
+time=     49000 	         0 samples processed,          0 of them hit
+time=     50000 	         0 samples processed,          0 of them hit
+time=     51000 	         0 samples processed,          0 of them hit
+time=     52000 	         0 samples processed,          0 of them hit
+time=     53000 	         0 samples processed,          0 of them hit
+time=     54000 	         0 samples processed,          0 of them hit
+time=     55000 	         0 samples processed,          0 of them hit
+
+[ERROR] Signal s_j_x mismatch!
+	RTL: 20
+	Gold: 24
+Error: Hash function failed
+$finish called from file "verif/smpl_cnt_sb.sv", line 139.
+$finish at simulation time                65010
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 65010 ns
+CPU Time:      0.660 seconds;       Data structure size:   0.2Mb
+Thu Nov 14 14:48:36 2024
