@@ -336,6 +336,8 @@ endgenerate
         //////// ASSIGN "out_box_R10S" and "outvalid_R10H"
         // START CODE HERE
         //first set the upper right corner
+        out_box_R10S[1][0] = rounded_box_R10S[1][0];
+        out_box_R10S[1][1] = rounded_box_R10S[1][1];
         if (rounded_box_R10S[1][0] > screen_RnnnnS[0]) begin
             out_box_R10S[1][0] = screen_RnnnnS[0];
         end 
@@ -343,10 +345,12 @@ endgenerate
             out_box_R10S[1][1] = screen_RnnnnS[1];
         end
         else begin
-            out_box_R10S[1][0] = rounded_box_R10S[1][0];
-            out_box_R10S[1][1] = rounded_box_R10S[1][1];
+            // out_box_R10S[1][0] = rounded_box_R10S[1][0];
+            // out_box_R10S[1][1] = rounded_box_R10S[1][1];
         end
         //next set the lower left corner
+        out_box_R10S[0][0] = rounded_box_R10S[0][0];
+        out_box_R10S[0][1] = rounded_box_R10S[0][1];
         if (rounded_box_R10S[0][0] < 0) begin
             out_box_R10S[0][0] = 0;
         end 
@@ -354,8 +358,8 @@ endgenerate
             out_box_R10S[0][1] = 0;
         end
         else begin
-            out_box_R10S[0][0] = rounded_box_R10S[0][0];
-            out_box_R10S[0][1] = rounded_box_R10S[0][1];
+            // out_box_R10S[0][0] = rounded_box_R10S[0][0];
+            // out_box_R10S[0][1] = rounded_box_R10S[0][1];
         end
         // END CODE HERE
         outvalid_R10H = validTri_R10H && (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);

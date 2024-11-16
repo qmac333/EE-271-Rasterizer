@@ -249,6 +249,32 @@ if(MOD_FSM == 0) begin // Using baseline FSM
     // check the comments 'A Note on Signal Names'
     // at the begining of the module for the help on
     // understanding the signals here
+    logic [SIGFIG-1:0] increment;
+    always_comb begin
+        increment = 0;
+        case(subSample_RnnnnU)
+            4'b1000: begin
+                //1x MSAA eq. to 1 sample per pixel
+                //no rounding needed
+                increment = 12'b010000000000;
+            end
+            4'b0100: begin
+                //4x MSAA eq to 4 samples per pixel, a sample is half a pixel on a side
+                increment = 12'b001000000000;
+            end
+            4'b0010: begin
+                //16x MSAA eq to 16 sample per pixel, a sample is a quarter pixel on a side.
+                increment = 12'b000100000000;
+            end
+            4'b0001: begin
+                //64x MSAA eq to 64 samples per pixel, a sample is an eighth of a pixel on a side.
+                increment = 12'b000010000000;
+            end
+            default: begin
+                increment = 0;
+            end
+        endcase
+    end
 
     always_comb begin
         // START CODE HERE
@@ -259,23 +285,24 @@ if(MOD_FSM == 0) begin // Using baseline FSM
         if (state_R14H == WAIT_STATE && validTri_R13H) begin
             next_sample_R14S[0] = box_R13S[0][0];
             next_sample_R14S[1] = box_R13S[0][1];
+            next_validSamp_R14H = 1'b1;
         end
         //check if at right edge
-        if (state_R14H == TEST_STATE && sample_R14S[0] == box_R14S[1][0]) begin
+        else if (state_R14H == TEST_STATE && sample_R14S[0] == box_R14S[1][0]) begin
             // next_up_samp_R14S[0] = box_R14S[0][0];
-            // next_up_samp_R14S[1] = sample_R14S[1] + 1;
+            // next_up_samp_R14S[1] = sample_R14S[1] + increment;
             next_sample_R14S[0] = box_R14S[0][0];
-            next_sample_R14S[1] = sample_R14S[1] + 1;
+            next_sample_R14S[1] = sample_R14S[1] + increment;
             at_right_edg_R14H = 1'b1;
             next_validSamp_R14H = 1'b1;
         end
         //check if at top edge
         else if (state_R14H == TEST_STATE && sample_R14S[1] == box_R14S[1][1]) begin
-            // next_rt_samp_R14S[0] = sample_R14S[0] + 1;
+            // next_rt_samp_R14S[0] = sample_R14S[0] + increment;
             // next_rt_samp_R14S[1] = sample_R14S[1];
-            // next_up_samp_R14S[0] = sample_R14S[0] + 1;
+            // next_up_samp_R14S[0] = sample_R14S[0] + increment;
             // next_up_samp_R14S[1] = sample_R14S[1];
-            next_sample_R14S[0] = sample_R14S[0] + 1;
+            next_sample_R14S[0] = sample_R14S[0] + increment;
             next_sample_R14S[1] = sample_R14S[1];
             at_top_edg_R14H = 1'b1;
             next_validSamp_R14H = 1'b1;
@@ -286,9 +313,9 @@ if(MOD_FSM == 0) begin // Using baseline FSM
             next_validSamp_R14H = 1'b0;
         end
         else begin
-            // next_rt_samp_R14S[0] = sample_R14S[0] + 1;
+            // next_rt_samp_R14S[0] = sample_R14S[0] + increment;
             // next_rt_samp_R14S[1] = sample_R14S[1];
-            next_sample_R14S[0] = sample_R14S[0] + 1;
+            next_sample_R14S[0] = sample_R14S[0] + increment;
             next_sample_R14S[1] = sample_R14S[1];
             at_right_edg_R14H = 1'b0;
             at_top_edg_R14H = 1'b0;

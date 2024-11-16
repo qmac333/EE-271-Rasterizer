@@ -136,7 +136,7 @@ module smpl_cnt_sb
                 int'(s_j_y_RnnS)
             )) begin
                 $display("Error: Hash function failed");
-                // $finish();
+                $finish();
             end
         end
     end
