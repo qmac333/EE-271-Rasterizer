@@ -389,12 +389,7 @@ if(MOD_FSM == 0) begin // Using baseline FSM
                 next_box_R14S = box_R14S;
                 next_color_R14U = color_R14U;
 
-                if (at_right_edg_R14H == 1'b1) begin
-                    next_sample_R14S = next_up_samp_R14S;
-                end
-                else begin
-                    next_sample_R14S = next_rt_samp_R14S;
-                end
+                
 
                 if (at_end_box_R14H) begin
                     next_state_R14H = WAIT_STATE;
@@ -406,6 +401,12 @@ if(MOD_FSM == 0) begin // Using baseline FSM
                     next_state_R14H = TEST_STATE;
                     next_halt_RnnnnL = 1'b0;
                     next_validSamp_R14H = 1'b1;
+                    if (at_right_edg_R14H) begin
+                        next_sample_R14S = next_up_samp_R14S;
+                    end
+                    else begin
+                        next_sample_R14S = next_rt_samp_R14S;
+                    end
                 end
             end
             default: begin

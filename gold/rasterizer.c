@@ -119,7 +119,8 @@ BoundingBox get_bounding_box(Triangle triangle, Screen screen, Config config)
   // printf("upperright_x: %d\n", bbox.upper_right.x);
   // printf("upperright_y: %d\n", bbox.upper_right.y);
   // // check if bbox is valid
-  bbox.valid = (bbox.upper_right.x > bbox.lower_left.x) && (bbox.upper_right.y > bbox.lower_left.y);
+  // bbox.valid = (bbox.upper_right.x > bbox.lower_left.x) && (bbox.upper_right.y > bbox.lower_left.y);
+  bbox.valid = (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height);
   // // END CODE HERE
   // printf("debug4\n");
   // printf("valid: %d\n", bbox.valid);

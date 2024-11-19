@@ -366,7 +366,9 @@ endgenerate
             // out_box_R10S[0][1] = rounded_box_R10S[0][1];
         end
         // END CODE HERE
-        outvalid_R10H = validTri_R10H && (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
+        // outvalid_R10H = validTri_R10H && (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
+        // outvalid_R10H = (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
+        outvalid_R10H = (out_box_R10S[0][0] >= 0) && (out_box_R10S[0][1] >= 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]);
     end
 
     //Assertion for checking if outvalid_R10H has been assigned properly
