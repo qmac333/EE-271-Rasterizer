@@ -1,0 +1,60 @@
+The design has assertions or cover properties.
+The assertion browser can be used to view them. Click on the assertion toolbar button or use the menu 'Window->Panes->Assertion' to open it.
+The file 'wave.vpd' was opened successfully.
+With selected criteria, DVE has found 'results at time 51000
+    top_rast.rast.test_iterator.genblk1.state_R14H[0:0]'.
+With selected criteria, DVE has found 'results at time 0
+    top_rast.rast.test_iterator.genblk1.state_R14H[0:0]'.
+With selected criteria, DVE has found 'results at time 51000
+    top_rast.rast.test_iterator.genblk1.state_R14H[0:0]'.
+The file '/home/users/jiajunc4/ee271/gitproj_part1/EE-271-Rasterizer/wave.vpd' was opened successfully.
+The file '/home/users/jiajunc4/ee271/gitproj_part1/EE-271-Rasterizer/wave.vpd' was opened successfully.
+The file '/home/users/jiajunc4/ee271/gitproj_part1/EE-271-Rasterizer/wave.vpd' was opened successfully.
+With selected criteria, DVE has found 'results at time 231007000
+    top_rast.rast.test_iterator.validTri_R13H'.
+With selected criteria, DVE has found 'results at time 230980000
+    top_rast.rast.test_iterator.validTri_R13H'.
+With selected criteria, DVE has found 'results at time 229519000
+    top_rast.rast.test_iterator.validTri_R13H'.
+With selected criteria, DVE has found 'results at time 229456000
+    top_rast.rast.test_iterator.validTri_R13H'.
+With selected criteria, DVE has found 'results at time 219742000
+    top_rast.rast.test_iterator.validTri_R13H'.
+With selected criteria, DVE has found 'results at time 170263000
+    top_rast.rast.test_iterator.validTri_R13H'.
+Warning: [DVWW009] 
+Seek hit time zero with no more matches.
+Warning: [DVWW009] 
+Seek hit time zero with no more matches.
+Warning: [DVWW009] 
+Seek hit time zero with no more matches.
+Warning: [DVWW009] 
+Seek hit time zero with no more matches.
+With selected criteria, DVE has found 'results at time 50000
+    top_rast.rast.test_iterator.validTri_R13H'.
+Warning: [DVWW010] 
+Seek hit end of values with no more matches.
+Warning: [DVWW010] 
+Seek hit end of values with no more matches.
+With selected criteria, DVE has found 'results at time 79789000
+    top_rast.rast.test_iterator.validTri_R13H'.
+With selected criteria, DVE has found 'results at time 50000
+    top_rast.rast.test_iterator.validTri_R13H'.
+Warning: [DVWW009] 
+Seek hit time zero with no more matches.
+Warning: [DVWW009] 
+Seek hit time zero with no more matches.
+The file '/home/users/jiajunc4/ee271/gitproj_part1/EE-271-Rasterizer/wave.vpd' was opened successfully.
+The file '/home/users/jiajunc4/ee271/gitproj_part1/EE-271-Rasterizer/wave.vpd' was opened successfully.
+With selected criteria, DVE has found 'results at time 1595000
+    top_rast.rast.test_iterator.genblk1.at_right_edg_R14H'.
+Warning: [DVWW009] 
+Seek hit time zero with no more matches.
+The file '/home/users/jiajunc4/ee271/gitproj_part1/EE-271-Rasterizer/wave.vpd' was opened successfully.
+Warning: [DVWW009] 
+Seek hit time zero with no more matches.
+With selected criteria, DVE has found 'results at time 4566000
+    top_rast.rast.test_iterator.genblk1.at_top_edg_R14H'.
+With selected criteria, DVE has found 'results at time 4577000
+    top_rast.rast.test_iterator.genblk1.at_top_edg_R14H'.
+The file '/home/users/jiajunc4/ee271/gitproj_part1/EE-271-Rasterizer/wave.vpd' was opened successfully.
