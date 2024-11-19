@@ -104,7 +104,6 @@ module sampletest
     // Consider the following steps:
 
     // START CODE HERE
-    // (2) Organize edges (form three edges for triangles)
     always_comb begin
         // (1) Shift X, Y coordinates such that the fragment resides on the (0,0) position.
         tri_shift_R16S[0][0] = tri_R16S[0][0] - sample_R16S[0];
@@ -114,7 +113,29 @@ module sampletest
         tri_shift_R16S[2][0] = tri_R16S[2][0] - sample_R16S[0];
         tri_shift_R16S[2][1] = tri_R16S[2][1] - sample_R16S[1];
 
-        // (3) Calculate distance x_1 * y_2 - x_2 * y_1
+        // (2) Organize edges (form three edges for triangles)
+        // edge_R16S[0][0][0] = tri_shift_R16S[0][0];
+        // edge_R16S[0][0][1] = tri_shift_R16S[0][1];
+        // edge_R16S[0][1][0] = tri_shift_R16S[1][0];
+        // edge_R16S[0][1][1] = tri_shift_R16S[1][1];
+
+        // edge_R16S[1][0][0] = tri_shift_R16S[1][0];
+        // edge_R16S[1][0][1] = tri_shift_R16S[1][1];
+        // edge_R16S[1][1][0] = tri_shift_R16S[2][0];
+        // edge_R16S[1][1][1] = tri_shift_R16S[2][1];
+
+        // edge_R16S[2][0][0] = tri_shift_R16S[2][0];
+        // edge_R16S[2][0][1] = tri_shift_R16S[2][1];
+        // edge_R16S[2][1][0] = tri_shift_R16S[0][0];
+        // edge_R16S[2][1][1] = tri_shift_R16S[0][1];
+
+
+        
+        // // (3) Calculate distance x_1 * y_2 - x_2 * y_1
+        // dist_lg_R16S[0] = edge_R16S[0][0][0] * edge_R16S[0][1][1] - edge_R16S[0][1][0] * edge_R16S[0][0][1];
+        // dist_lg_R16S[1] = edge_R16S[1][0][0] * edge_R16S[1][1][1] - edge_R16S[1][1][0] * edge_R16S[1][0][1];
+        // dist_lg_R16S[2] = edge_R16S[2][0][0] * edge_R16S[2][1][1] - edge_R16S[2][1][0] * edge_R16S[2][0][1];
+
         dist_lg_R16S[0] = (tri_shift_R16S[0][0] * tri_shift_R16S[1][1]) - (tri_shift_R16S[1][0] * tri_shift_R16S[0][1]);
         dist_lg_R16S[1] = (tri_shift_R16S[1][0] * tri_shift_R16S[2][1]) - (tri_shift_R16S[2][0] * tri_shift_R16S[1][1]);
         dist_lg_R16S[2] = (tri_shift_R16S[2][0] * tri_shift_R16S[0][1]) - (tri_shift_R16S[0][0] * tri_shift_R16S[2][1]);

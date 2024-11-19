@@ -287,6 +287,11 @@ if(MOD_FSM == 0) begin // Using baseline FSM
             next_sample_R14S[1] = box_R13S[0][1];
             next_validSamp_R14H = 1'b1;
         end
+        //check if at end of box
+        else if (state_R14H == TEST_STATE && sample_R14S[0] == box_R14S[1][0] && sample_R14S[1] == box_R14S[1][1]) begin
+            at_end_box_R14H = 1'b1;
+            next_validSamp_R14H = 1'b0;
+        end
         //check if at right edge
         else if (state_R14H == TEST_STATE && sample_R14S[0] == box_R14S[1][0]) begin
             // next_up_samp_R14S[0] = box_R14S[0][0];
@@ -306,11 +311,6 @@ if(MOD_FSM == 0) begin // Using baseline FSM
             next_sample_R14S[1] = sample_R14S[1];
             at_top_edg_R14H = 1'b1;
             next_validSamp_R14H = 1'b1;
-        end
-        //check if at end of box
-        else if (state_R14H == TEST_STATE && sample_R14S[0] == box_R14S[1][0] && sample_R14S[1] == box_R14S[1][1]) begin
-            at_end_box_R14H = 1'b1;
-            next_validSamp_R14H = 1'b0;
         end
         else begin
             // next_rt_samp_R14S[0] = sample_R14S[0] + increment;
@@ -385,7 +385,7 @@ if(MOD_FSM == 0) begin // Using baseline FSM
 
     //Your assertions goes here
     // START CODE HERE
-    assert property (@(posedge clk) disable iff (rst) (validTri_R13H -> (next_state_R14H == TEST_STATE)));
+    assert property (@(posedge clk) disable iff (rst) ((validTri_R13H && (state_R14H == WAIT_STATE)) -> (next_state_R14H == TEST_STATE)));
     assert property (@(posedge clk) disable iff (rst) (at_end_box_R14H -> ((next_state_R14H == WAIT_STATE) && (state_R14H == TEST_STATE))));
     // END CODE HERE
     // Assertion ends

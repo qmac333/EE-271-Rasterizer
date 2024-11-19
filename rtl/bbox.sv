@@ -194,6 +194,10 @@ module bbox
     // 1) Each of the coordinates box_R10S are always and uniquely assigned
     // 2) Upper right coordinate is never less than lower left
 
+    // assert property 
+    assert property( @(posedge clk) (box_R10S[0][0] - box_R10S[1][0]) <= 0);
+    assert property( @(posedge clk) (box_R10S[0][1] - box_R10S[1][1]) <= 0);
+
     // START CODE HERE
     //Assertions to check if all cases are covered and assignments are unique 
     // (already done for you if you use the bbox_sel_R10H select signal as declared)

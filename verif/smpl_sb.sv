@@ -107,9 +107,28 @@ module smpl_sb
 
             $fwrite( file , "sample.x:%f\t",  (1.0 * sample_RnnS[0]) / (1 << RADIX));
             $fwrite( file , "sample.y:%f\t",  (1.0 * sample_RnnS[1]) / (1 << RADIX));
+            
+
+            // $fwrite( file , "uP.v_0.x: %f\t" , tri_RnnS[0][0]);
+            // $fwrite( file , "uP.v_0.y: %f\t" , tri_RnnS[0][1]);
+            // $fwrite( file , "uP.v_1.x: %f\t" , tri_RnnS[1][0]);
+            // $fwrite( file , "uP.v_1.y: %f\t" , tri_RnnS[1][1]);
+
+            // $fwrite( file , "\n\t\t" );
+            // $fwrite( file , "uP.v_2.x: %f\t" , tri_RnnS[2][0]);
+            // $fwrite( file , "uP.v_2.y: %f\t" , tri_RnnS[2][1]);
+
+            // $fwrite( file , "\n\t\t" );
+
+            // $fwrite( file , "sample.x:%f\t",  sample_RnnS[0]);
+            // $fwrite( file , "sample.y:%f\t",  sample_RnnS[1]);
+
+
             $fwrite( file , "hit:%b\n" , hit_valid_R18H );
 
             assert( 0 ) else $error( "time=%10t ERROR: Sample Test Check Failed", $time );
+            // assert( 0 ) else $display( "time=%10t ERROR: Sample Test Check Failed", $time );
+            // $finish();
         end
     end
 
