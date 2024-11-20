@@ -276,21 +276,26 @@ always_comb begin
             //1x MSAA eq. to 1 sample per pixel
             //no rounding needed
             lg2 = 0;
+            // mask = {RADIX{1'b0}};
         end
         4'b0100: begin
             //4x MSAA eq to 4 samples per pixel, a sample is half a pixel on a side
             lg2 = 1;
+            // mask = {1'b1, {RADIX-1{1'b0}}};
         end
         4'b0010: begin
             //16x MSAA eq to 16 sample per pixel, a sample is a quarter pixel on a side.
             lg2 = 2;
+            // mask = {2'b11, {RADIX-2{1'b0}}};
         end
         4'b0001: begin
             //64x MSAA eq to 64 samples per pixel, a sample is an eighth of a pixel on a side.
             lg2 = 3;
+            // mask = {3'b111, {RADIX-3{1'b0}}};
         end
         default: begin
             lg2 = 0;
+            // mask = {RADIX{1'b0}};
         end
     endcase
     bits_cut = RADIX - lg2;
@@ -311,6 +316,8 @@ for(genvar i = 0; i < 2; i = i + 1) begin
             // START CODE HERE
             rounded_box_R10S[i][j][RADIX-1:0]
                 = box_R10S[i][j][RADIX-1:0] & mask;
+            // rounded_box_R10S[i][j][RADIX-1:0]
+            //     = {box_R10S[i][j][RADIX-1:RADIX-lg2], {(RADIX-lg2){1'b0}}};
             // END CODE HERE
         end // always_comb
 

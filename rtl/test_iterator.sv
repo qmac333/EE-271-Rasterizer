@@ -256,19 +256,23 @@ if(MOD_FSM == 0) begin // Using baseline FSM
             4'b1000: begin
                 //1x MSAA eq. to 1 sample per pixel
                 //no rounding needed
-                increment = 12'b010000000000;
+                // increment = 12'b010000000000;
+                increment = {1'b1, {RADIX{1'b0}}};
             end
             4'b0100: begin
                 //4x MSAA eq to 4 samples per pixel, a sample is half a pixel on a side
-                increment = 12'b001000000000;
+                // increment = 12'b001000000000;
+                increment = {1'b1, {RADIX-1{1'b0}}};
             end
             4'b0010: begin
                 //16x MSAA eq to 16 sample per pixel, a sample is a quarter pixel on a side.
-                increment = 12'b000100000000;
+                // increment = 12'b000100000000;
+                increment = {1'b1, {RADIX-2{1'b0}}};
             end
             4'b0001: begin
                 //64x MSAA eq to 64 samples per pixel, a sample is an eighth of a pixel on a side.
-                increment = 12'b000010000000;
+                // increment = 12'b000010000000;
+                increment = {1'b1, {RADIX-3{1'b0}}};
             end
             default: begin
                 increment = 0;
@@ -426,8 +430,8 @@ if(MOD_FSM == 0) begin // Using baseline FSM
 
     //Your assertions goes here
     // START CODE HERE
-    // assert property (@(posedge clk) disable iff (rst) ((validTri_R13H && (state_R14H == WAIT_STATE)) -> (next_state_R14H == TEST_STATE)));
-    // assert property (@(posedge clk) disable iff (rst) (at_end_box_R14H -> ((next_state_R14H == WAIT_STATE) && (state_R14H == TEST_STATE))));
+    assert property (@(posedge clk) disable iff (rst) ((validTri_R13H && (state_R14H == WAIT_STATE)) -> (next_state_R14H == TEST_STATE)));
+    assert property (@(posedge clk) disable iff (rst) ((at_end_box_R14H && (state_R14H == TEST_STATE)) -> ((next_state_R14H == WAIT_STATE))));
     // END CODE HERE
     // Assertion ends
 
@@ -446,10 +450,10 @@ if(MOD_FSM == 0) begin // Using baseline FSM
 
     //Check that Proposed Sample is in BBox
     // START CODE HERE
-    // assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, box_R14S[0][0], sample_R14S[0], at_end_box_R14H)));
-    // assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, sample_R14S[0], box_R14S[1][0], at_end_box_R14H)));
-    // assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, box_R14S[0][1], sample_R14S[1], at_end_box_R14H)));
-    // assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, sample_R14S[1], box_R14S[1][1], at_end_box_R14H)));
+    assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, next_box_R14S[0][0], next_sample_R14S[0], next_validSamp_R14H)));
+    assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, next_sample_R14S[0], next_box_R14S[1][0], next_validSamp_R14H)));
+    assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, next_box_R14S[0][1], next_sample_R14S[1], next_validSamp_R14H)));
+    assert property (@(posedge clk) disable iff (rst) (rb_lt(rst, next_sample_R14S[1], next_box_R14S[1][1], next_validSamp_R14H)));
     // END CODE HERE
     //Check that Proposed Sample is in BBox
 
