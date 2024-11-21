@@ -136,20 +136,20 @@ BoundingBox get_bounding_box(Triangle triangle, Screen screen, Config config)
   // int cross2 = x2 * y0 - x0 * y2;
   // int frontfacing = (cross0 <= 0 && cross1 < 0 && cross2 <= 0);
 
-  // int x0 = triangle.v[0].x;
-  // int y0 = triangle.v[0].y;
-  // int x1 = triangle.v[1].x;
-  // int y1 = triangle.v[1].y;
-  // int x2 = triangle.v[2].x;
-  // int y2 = triangle.v[2].y;
+  int x0 = triangle.v[0].x;
+  int y0 = triangle.v[0].y;
+  int x1 = triangle.v[1].x;
+  int y1 = triangle.v[1].y;
+  int x2 = triangle.v[2].x;
+  int y2 = triangle.v[2].y;
 
   
-  // int cross_product = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
-  // int backfacing = cross_product > 0;
+  int cross_product = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
+  int backfacing = cross_product > 0;
   // // check if bbox is valid
   // bbox.valid = (bbox.upper_right.x > bbox.lower_left.x) && (bbox.upper_right.y > bbox.lower_left.y);
-  // bbox.valid = (!backfacing && (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height));
-  bbox.valid = (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height);
+  bbox.valid = (!backfacing && (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height));
+  // bbox.valid = (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height);
   //if the triangle is backfacing, set the bounding box to invalid
   // if (cross0 > 0 && cross1 >= 0 && cross2 > 0)
   // {
