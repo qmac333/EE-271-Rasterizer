@@ -342,8 +342,8 @@ endgenerate
     // Invalid if BBox is down/left of Screen
     // outvalid_R10H high if validTri_R10H && BBox is valid
     // logic frontfacing;
-    logic backfacing;
-    assign backfacing = (tri_R10S[1][0] - tri_R10S[0][0]) * (tri_R10S[2][1] - tri_R10S[1][1]) > (tri_R10S[1][1] - tri_R10S[0][1]) * (tri_R10S[2][0] - tri_R10S[1][0]);
+    // logic backfacing;
+    // assign backfacing = (tri_R10S[1][0] - tri_R10S[0][0]) * (tri_R10S[2][1] - tri_R10S[1][1]) > (tri_R10S[1][1] - tri_R10S[0][1]) * (tri_R10S[2][0] - tri_R10S[1][0]);
     always_comb begin
 
         //////// ASSIGN "out_box_R10S" and "outvalid_R10H"
@@ -364,10 +364,16 @@ endgenerate
         //next set the lower left corner
         out_box_R10S[0][0] = rounded_box_R10S[0][0];
         out_box_R10S[0][1] = rounded_box_R10S[0][1];
-        if (rounded_box_R10S[0][0] < 0) begin
+        // if (rounded_box_R10S[0][0] < 0) begin
+        //     out_box_R10S[0][0] = 0;
+        // end 
+        // else if (rounded_box_R10S[0][1] < 0) begin
+        //     out_box_R10S[0][1] = 0;
+        // end
+        if (rounded_box_R10S[0][0][SIGFIG-1] == 1) begin
             out_box_R10S[0][0] = 0;
         end 
-        else if (rounded_box_R10S[0][1] < 0) begin
+        else if (rounded_box_R10S[0][1][SIGFIG-1] == 1) begin
             out_box_R10S[0][1] = 0;
         end
         else begin
@@ -387,7 +393,10 @@ endgenerate
         // END CODE HERE
         // outvalid_R10H = validTri_R10H && (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
         // outvalid_R10H = (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
-        outvalid_R10H = (!backfacing && (out_box_R10S[0][0] >= 0) && (out_box_R10S[0][1] >= 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]));
+        // outvalid_R10H = (!backfacing && (out_box_R10S[0][0] >= 0) && (out_box_R10S[0][1] >= 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]));
+        // outvalid_R10H = ((out_box_R10S[0][0][SIGFIG-1] == 0) && (out_box_R10S[0][1][SIGFIG-1] == 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]));
+        outvalid_R10H = validTri_R10H;
+
     end
 
     //Assertion for checking if outvalid_R10H has been assigned properly
