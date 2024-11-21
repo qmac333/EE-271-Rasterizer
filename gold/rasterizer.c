@@ -118,9 +118,43 @@ BoundingBox get_bounding_box(Triangle triangle, Screen screen, Config config)
   // printf("lowerleft_y: %d\n", bbox.lower_left.y);
   // printf("upperright_x: %d\n", bbox.upper_right.x);
   // printf("upperright_y: %d\n", bbox.upper_right.y);
+
+  //choose the centroid for backface culling
+  // Vertex2D centroid;
+  // centroid.x = (bbox.lower_left.x + bbox.upper_right.x) >> 1;
+  // centroid.y = (bbox.lower_left.y + bbox.upper_right.y) >> 1;
+
+  // //check if the triangle is backfacing
+  // int x0 = triangle.v[0].x - centroid.x;
+  // int y0 = triangle.v[0].y - centroid.y;
+  // int x1 = triangle.v[1].x - centroid.x;
+  // int y1 = triangle.v[1].y - centroid.y;
+  // int x2 = triangle.v[2].x - centroid.x;
+  // int y2 = triangle.v[2].y - centroid.y;
+  // int cross0 = x0 * y1 - x1 * y0;
+  // int cross1 = x1 * y2 - x2 * y1;
+  // int cross2 = x2 * y0 - x0 * y2;
+  // int frontfacing = (cross0 <= 0 && cross1 < 0 && cross2 <= 0);
+
+  int x0 = triangle.v[0].x;
+  int y0 = triangle.v[0].y;
+  int x1 = triangle.v[1].x;
+  int y1 = triangle.v[1].y;
+  int x2 = triangle.v[2].x;
+  int y2 = triangle.v[2].y;
+
+  
+  int cross_product = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
+  int backfacing = cross_product > 0;
   // // check if bbox is valid
   // bbox.valid = (bbox.upper_right.x > bbox.lower_left.x) && (bbox.upper_right.y > bbox.lower_left.y);
-  bbox.valid = (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height);
+  bbox.valid = (!backfacing && (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height));
+  // bbox.valid = (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height);
+  //if the triangle is backfacing, set the bounding box to invalid
+  // if (cross0 > 0 && cross1 >= 0 && cross2 > 0)
+  // {
+  //   bbox.valid = false;
+  // }
   // // END CODE HERE
   // printf("debug4\n");
   // printf("valid: %d\n", bbox.valid);

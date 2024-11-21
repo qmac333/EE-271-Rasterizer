@@ -102,7 +102,7 @@ module sampletest
     // Your job is to produce the value for hit_valid_R16H signal, which indicates whether a sample lies inside the triangle.
     // hit_valid_R16H is high if validSamp_R16H && sample inside triangle (with back face culling)
     // Consider the following steps:
-
+    logic [2:0] less_than_0_ornot;
     // START CODE HERE
     always_comb begin
         // (1) Shift X, Y coordinates such that the fragment resides on the (0,0) position.
@@ -136,12 +136,55 @@ module sampletest
         // dist_lg_R16S[1] = edge_R16S[1][0][0] * edge_R16S[1][1][1] - edge_R16S[1][1][0] * edge_R16S[1][0][1];
         // dist_lg_R16S[2] = edge_R16S[2][0][0] * edge_R16S[2][1][1] - edge_R16S[2][1][0] * edge_R16S[2][0][1];
 
-        dist_lg_R16S[0] = (tri_shift_R16S[0][0] * tri_shift_R16S[1][1]) - (tri_shift_R16S[1][0] * tri_shift_R16S[0][1]);
-        dist_lg_R16S[1] = (tri_shift_R16S[1][0] * tri_shift_R16S[2][1]) - (tri_shift_R16S[2][0] * tri_shift_R16S[1][1]);
-        dist_lg_R16S[2] = (tri_shift_R16S[2][0] * tri_shift_R16S[0][1]) - (tri_shift_R16S[0][0] * tri_shift_R16S[2][1]);
+        // dist_lg_R16S[0] = (tri_shift_R16S[0][0] * tri_shift_R16S[1][1]) - (tri_shift_R16S[1][0] * tri_shift_R16S[0][1]);
+        // dist_lg_R16S[1] = (tri_shift_R16S[1][0] * tri_shift_R16S[2][1]) - (tri_shift_R16S[2][0] * tri_shift_R16S[1][1]);
+        // dist_lg_R16S[2] = (tri_shift_R16S[2][0] * tri_shift_R16S[0][1]) - (tri_shift_R16S[0][0] * tri_shift_R16S[2][1]);
         
         // (4) Check distance and assign hit_valid_R16H.
-        hit_valid_R16H = validSamp_R16H && (dist_lg_R16S[0] <= 0) && (dist_lg_R16S[1] < 0) && (dist_lg_R16S[2] <= 0);
+        // hit_valid_R16H = validSamp_R16H && (dist_lg_R16S[0] <= 0) && (dist_lg_R16S[1] < 0) && (dist_lg_R16S[2] <= 0);
+
+
+        //do bit manipulation to compare the sign of the result
+        //if first term is negative and second term is positive, then the dist is negative
+        if ((tri_shift_R16S[0][0][SIGFIG-1] ^ tri_shift_R16S[1][1][SIGFIG-1]) && (tri_shift_R16S[1][0][SIGFIG-1] == tri_shift_R16S[0][1][SIGFIG-1])) begin
+            less_than_0_ornot[0] = 1;
+        end 
+        // if positive, first term has to be positive and second term has to be negative
+        else if ((tri_shift_R16S[0][0][SIGFIG-1] == tri_shift_R16S[1][1][SIGFIG-1]) && (tri_shift_R16S[1][0][SIGFIG-1] ^ tri_shift_R16S[0][1][SIGFIG-1])) begin
+            less_than_0_ornot[0] = 0;
+        end else
+        // do the multiplication
+        begin
+            less_than_0_ornot[0] = ((tri_shift_R16S[0][0] * tri_shift_R16S[1][1]) - (tri_shift_R16S[1][0] * tri_shift_R16S[0][1]))<=0?1:0;
+        end
+
+        // 
+        if ((tri_shift_R16S[1][0][SIGFIG-1] ^ tri_shift_R16S[2][1][SIGFIG-1]) && (tri_shift_R16S[2][0][SIGFIG-1] == tri_shift_R16S[1][1][SIGFIG-1])) begin
+            less_than_0_ornot[1] = 1;
+        end 
+        // if positive, first term has to be positive and second term has to be negative
+        else if ((tri_shift_R16S[1][0][SIGFIG-1] == tri_shift_R16S[2][1][SIGFIG-1]) && (tri_shift_R16S[2][0][SIGFIG-1] ^ tri_shift_R16S[1][1][SIGFIG-1])) begin
+            less_than_0_ornot[1] = 0;
+        end else
+        // do the multiplication
+        begin
+            less_than_0_ornot[1] = ((tri_shift_R16S[1][0] * tri_shift_R16S[2][1]) - (tri_shift_R16S[2][0] * tri_shift_R16S[1][1]))<0?1:0;
+        end
+
+        if ((tri_shift_R16S[2][0][SIGFIG-1] ^ tri_shift_R16S[0][1][SIGFIG-1]) && (tri_shift_R16S[0][0][SIGFIG-1] == tri_shift_R16S[2][1][SIGFIG-1])) begin
+            less_than_0_ornot[2] = 1;
+        end 
+        // if positive, first term has to be positive and second term has to be negative
+        else if ((tri_shift_R16S[2][0][SIGFIG-1] == tri_shift_R16S[0][1][SIGFIG-1]) && (tri_shift_R16S[0][0][SIGFIG-1] ^ tri_shift_R16S[2][1][SIGFIG-1])) begin
+            less_than_0_ornot[2] = 0;
+        end else
+        // do the multiplication
+        begin
+            less_than_0_ornot[2] = ((tri_shift_R16S[2][0] * tri_shift_R16S[0][1]) - (tri_shift_R16S[0][0] * tri_shift_R16S[2][1]))<=0?1:0;
+        end
+
+
+        hit_valid_R16H = validSamp_R16H && (less_than_0_ornot[0]) && (less_than_0_ornot[1]) && (less_than_0_ornot[2]);
 
         // if (hit_valid_R16H) begin
         //     // (5) Calculate the hit position

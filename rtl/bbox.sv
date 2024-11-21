@@ -341,7 +341,9 @@ endgenerate
     // Invalid if BBox is up/right of Screen
     // Invalid if BBox is down/left of Screen
     // outvalid_R10H high if validTri_R10H && BBox is valid
-
+    // logic frontfacing;
+    logic backfacing;
+    assign backfacing = (tri_R10S[1][0] - tri_R10S[0][0]) * (tri_R10S[2][1] - tri_R10S[1][1]) > (tri_R10S[1][1] - tri_R10S[0][1]) * (tri_R10S[2][0] - tri_R10S[1][0]);
     always_comb begin
 
         //////// ASSIGN "out_box_R10S" and "outvalid_R10H"
@@ -372,10 +374,20 @@ endgenerate
             // out_box_R10S[0][0] = rounded_box_R10S[0][0];
             // out_box_R10S[0][1] = rounded_box_R10S[0][1];
         end
+
+        // if ((tri_R10S[1][0] - tri_R10S[0][0])[SIGFIG-1] ^ (tri_R10S[2][1] - tri_R10S[1][1])[SIGFIG-1]) && ((tri_R10S[1][1] - tri_R10S[0][1])[SIGFIG-1] == (tri_R10S[2][0] - tri_R10S[1][0])[SIGFIG-1]) begin  
+        //     frontfacing = 1;
+        // end
+        // else if ((tri_R10S[1][0] - tri_R10S[0][0])[SIGFIG-1] == (tri_R10S[2][1] - tri_R10S[1][1])[SIGFIG-1]) && ((tri_R10S[1][1] - tri_R10S[0][1])[SIGFIG-1] ^ (tri_R10S[2][0] - tri_R10S[1][0])[SIGFIG-1]) begin
+        //     frontfacing = 1;
+        // end
+        // else begin
+        //     frontfacing = (tri_R10S[1][0] - tri_R10S[0][0]) * (tri_R10S[2][1] - tri_R10S[1][1]) < (tri_R10S[1][1] - tri_R10S[0][1]) * (tri_R10S[2][0] - tri_R10S[1][0]);;
+        // end
         // END CODE HERE
         // outvalid_R10H = validTri_R10H && (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
         // outvalid_R10H = (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
-        outvalid_R10H = (out_box_R10S[0][0] >= 0) && (out_box_R10S[0][1] >= 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]);
+        outvalid_R10H = (!backfacing && (out_box_R10S[0][0] >= 0) && (out_box_R10S[0][1] >= 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]));
     end
 
     //Assertion for checking if outvalid_R10H has been assigned properly
