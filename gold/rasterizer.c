@@ -120,17 +120,17 @@ BoundingBox get_bounding_box(Triangle triangle, Screen screen, Config config)
   // printf("upperright_y: %d\n", bbox.upper_right.y);
 
   //choose the centroid for backface culling
-  // Vertex2D centroid;
-  // centroid.x = (bbox.lower_left.x + bbox.upper_right.x) >> 1;
-  // centroid.y = (bbox.lower_left.y + bbox.upper_right.y) >> 1;
+  Vertex2D centroid;
+  centroid.x = (bbox.lower_left.x + bbox.upper_right.x) >> 1;
+  centroid.y = (bbox.lower_left.y + bbox.upper_right.y) >> 1;
 
-  // //check if the triangle is backfacing
-  // int x0 = triangle.v[0].x - centroid.x;
-  // int y0 = triangle.v[0].y - centroid.y;
-  // int x1 = triangle.v[1].x - centroid.x;
-  // int y1 = triangle.v[1].y - centroid.y;
-  // int x2 = triangle.v[2].x - centroid.x;
-  // int y2 = triangle.v[2].y - centroid.y;
+  //check if the triangle is backfacing
+  int x0 = triangle.v[0].x - centroid.x;
+  int y0 = triangle.v[0].y - centroid.y;
+  int x1 = triangle.v[1].x - centroid.x;
+  int y1 = triangle.v[1].y - centroid.y;
+  int x2 = triangle.v[2].x - centroid.x;
+  int y2 = triangle.v[2].y - centroid.y;
   // int cross0 = x0 * y1 - x1 * y0;
   // int cross1 = x1 * y2 - x2 * y1;
   // int cross2 = x2 * y0 - x0 * y2;
@@ -144,12 +144,13 @@ BoundingBox get_bounding_box(Triangle triangle, Screen screen, Config config)
   // int y2 = triangle.v[2].y;
 
   
-  // int cross_product = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
-  // int backfacing = cross_product > 0;
+  int cross_product = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
+  int backfacing = cross_product > 0;
   // // check if bbox is valid
   // bbox.valid = (bbox.upper_right.x > bbox.lower_left.x) && (bbox.upper_right.y > bbox.lower_left.y);
-  // bbox.valid = (!backfacing && (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height));
-  bbox.valid = (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height);
+  bbox.valid = (!backfacing && (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height));
+  // bbox.valid = (frontfacing && (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height));
+  // bbox.valid = (bbox.upper_right.x >= 0) && (bbox.upper_right.y >= 0) && (bbox.lower_left.x < screen.width ) && (bbox.lower_left.y < screen.height);
   //if the triangle is backfacing, set the bounding box to invalid
   // if (cross0 > 0 && cross1 >= 0 && cross2 > 0)
   // {
@@ -184,6 +185,7 @@ bool sample_test(Triangle triangle, Sample sample)
   int cross2 = x2 * y0 - x0 * y2;
 
   isHit = (cross0 <= 0 && cross1 < 0 && cross2 <= 0);
+  // isHit = true;
   // END CODE HERE
 
   return isHit;

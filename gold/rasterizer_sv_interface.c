@@ -4,9 +4,9 @@
 #include <stdio.h>
 
 #define PRINT_ERROR(signal, rtl, gold) \
-    printf("\n[ERROR] Signal %s mismatch!\n", signal); \
-    printf("\tRTL: %d\n", rtl); \
-    printf("\tGold: %d\n", gold);
+    // printf("\n[ERROR] Signal %s mismatch!\n", signal); \
+    // printf("\tRTL: %d\n", rtl); \
+    // printf("\tGold: %d\n", gold);
 
 int check_bounding_box(
     int   v0_x,     //triangle
@@ -48,24 +48,24 @@ int check_bounding_box(
     int isCorrect = true;
     if(valid_triangle){
         if(valid_bbox != bbox.valid){
-            PRINT_ERROR("bbox_valid", valid_bbox, bbox.valid);
+            // PRINT_ERROR("bbox_valid", valid_bbox, bbox.valid);
             isCorrect = false;
         }
         else if(valid_bbox == true){
             if(ll_x != bbox.lower_left.x){
-                PRINT_ERROR("ll_x", ll_x, bbox.lower_left.x);
+                // PRINT_ERROR("ll_x", ll_x, bbox.lower_left.x);
                 isCorrect = false;
             }
             if(ll_y != bbox.lower_left.y){
-                PRINT_ERROR("ll_y", ll_y, bbox.lower_left.y);
+                // PRINT_ERROR("ll_y", ll_y, bbox.lower_left.y);
                 isCorrect = false;
             }
             if(ur_x != bbox.upper_right.x){
-                PRINT_ERROR("ur_x", ur_x, bbox.upper_right.x);
+                // PRINT_ERROR("ur_x", ur_x, bbox.upper_right.x);
                 isCorrect = false;
             }
             if(ur_y != bbox.upper_right.y){
-                PRINT_ERROR("ur_y", ur_y, bbox.upper_right.y);
+                // PRINT_ERROR("ur_y", ur_y, bbox.upper_right.y);
                 isCorrect = false;
             }
             

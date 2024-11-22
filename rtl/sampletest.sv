@@ -84,6 +84,8 @@ module sampletest
     localparam EDGES = (VERTS == 3) ? 3 : 5;
     localparam SHORTSF = SIGFIG;
     localparam MROUND = (2 * SHORTSF) - RADIX;
+    localparam LSB_CUT = 0; //bits being cut out
+    localparam MSB_CUT = 8;
 
     // output for retiming registers
     logic signed [SIGFIG-1:0]       hit_R18S_retime[AXIS-1:0];   // Hit Location
@@ -155,7 +157,8 @@ module sampletest
         end else
         // do the multiplication
         begin
-            less_than_0_ornot[0] = ((tri_shift_R16S[0][0] * tri_shift_R16S[1][1]) - (tri_shift_R16S[1][0] * tri_shift_R16S[0][1]))<=0?1:0;
+            // less_than_0_ornot[0] = ((tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0?1:0;
+            less_than_0_ornot[0] = ((signed'(tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) - ((signed'(tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0?1:0;
         end
 
         // 
@@ -168,7 +171,8 @@ module sampletest
         end else
         // do the multiplication
         begin
-            less_than_0_ornot[1] = ((tri_shift_R16S[1][0] * tri_shift_R16S[2][1]) - (tri_shift_R16S[2][0] * tri_shift_R16S[1][1]))<0?1:0;
+            // less_than_0_ornot[1] = ((tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<0?1:0;
+            less_than_0_ornot[1] = ((signed'(tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<0?1:0;
         end
 
         if ((tri_shift_R16S[2][0][SIGFIG-1] ^ tri_shift_R16S[0][1][SIGFIG-1]) && (tri_shift_R16S[0][0][SIGFIG-1] == tri_shift_R16S[2][1][SIGFIG-1])) begin
@@ -180,12 +184,13 @@ module sampletest
         end else
         // do the multiplication
         begin
-            less_than_0_ornot[2] = ((tri_shift_R16S[2][0] * tri_shift_R16S[0][1]) - (tri_shift_R16S[0][0] * tri_shift_R16S[2][1]))<=0?1:0;
+            // less_than_0_ornot[2] = ((tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0?1:0;
+            less_than_0_ornot[2] = ((signed'(tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0?1:0;
         end
 
 
         hit_valid_R16H = validSamp_R16H && (less_than_0_ornot[0]) && (less_than_0_ornot[1]) && (less_than_0_ornot[2]);
-
+        // hit_valid_R16H = validSamp_R16H;
         // if (hit_valid_R16H) begin
         //     // (5) Calculate the hit position
         //     hit_R16S[0] = sample_R16S[0];
