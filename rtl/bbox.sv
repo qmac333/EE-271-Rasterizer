@@ -381,15 +381,98 @@ endgenerate
             // out_box_R10S[0][1] = rounded_box_R10S[0][1];
         end
 
-        // if ((tri_R10S[1][0] - tri_R10S[0][0])[SIGFIG-1] ^ (tri_R10S[2][1] - tri_R10S[1][1])[SIGFIG-1]) && ((tri_R10S[1][1] - tri_R10S[0][1])[SIGFIG-1] == (tri_R10S[2][0] - tri_R10S[1][0])[SIGFIG-1]) begin  
-        //     frontfacing = 1;
-        // end
-        // else if ((tri_R10S[1][0] - tri_R10S[0][0])[SIGFIG-1] == (tri_R10S[2][1] - tri_R10S[1][1])[SIGFIG-1]) && ((tri_R10S[1][1] - tri_R10S[0][1])[SIGFIG-1] ^ (tri_R10S[2][0] - tri_R10S[1][0])[SIGFIG-1]) begin
-        //     frontfacing = 1;
+        // centroid[0] = (out_box_R10S[0][0] + out_box_R10S[1][0]) >>> 1;
+        // centroid[1] = (out_box_R10S[0][1] + out_box_R10S[1][1]) >>> 1;
+
+        // tri_shift_R10S[0][0] = tri_R10S[0][0] - centroid[0];
+        // tri_shift_R10S[0][1] = tri_R10S[0][1] - centroid[1];
+        // tri_shift_R10S[1][0] = tri_R10S[1][0] - centroid[0];
+        // tri_shift_R10S[1][1] = tri_R10S[1][1] - centroid[1];
+        // tri_shift_R10S[2][0] = tri_R10S[2][0] - centroid[0];
+        // tri_shift_R10S[2][1] = tri_R10S[2][1] - centroid[1];
+
+        // // if ((tri_R10S[1][0] - tri_R10S[0][0])[SIGFIG-1] ^ (tri_R10S[2][1] - tri_R10S[1][1])[SIGFIG-1]) && ((tri_R10S[1][1] - tri_R10S[0][1])[SIGFIG-1] == (tri_R10S[2][0] - tri_R10S[1][0])[SIGFIG-1]) begin  
+        // //     frontfacing = 1;
+        // // end
+        // // else if ((tri_R10S[1][0] - tri_R10S[0][0])[SIGFIG-1] == (tri_R10S[2][1] - tri_R10S[1][1])[SIGFIG-1]) && ((tri_R10S[1][1] - tri_R10S[0][1])[SIGFIG-1] ^ (tri_R10S[2][0] - tri_R10S[1][0])[SIGFIG-1]) begin
+        // //     frontfacing = 1;
+        // // end
+        // // else begin
+        // //     frontfacing = (tri_R10S[1][0] - tri_R10S[0][0]) * (tri_R10S[2][1] - tri_R10S[1][1]) < (tri_R10S[1][1] - tri_R10S[0][1]) * (tri_R10S[2][0] - tri_R10S[1][0]);;
+        // // end
+
+        
+        // top4bits[0] = tri_shift_R10S[0][0][SIGFIG-1:SIGFIG-4];
+        // top4bits[1] = tri_shift_R10S[0][1][SIGFIG-1:SIGFIG-4];
+        // top4bits[2] = tri_shift_R10S[1][0][SIGFIG-1:SIGFIG-4];
+        // top4bits[3] = tri_shift_R10S[1][1][SIGFIG-1:SIGFIG-4];
+        // top4bits[4] = tri_shift_R10S[2][0][SIGFIG-1:SIGFIG-4];
+        // top4bits[5] = tri_shift_R10S[2][1][SIGFIG-1:SIGFIG-4];
+        // if ((top4bits[0] != 4'h0) && (top4bits[0] != 4'hf))  bigtriangle_exists = 1;
+        // else bigtriangle_exists = 0;
+        // if (tri_shift_R10S[0][0][SIGFIG-4 +: 4] != 4'b0000 || (tri_shift_R10S[0][0][SIGFIG-4 +: 4] != 4'b1111)) begin
+        //     bigtriangle_exists = 1;
+        // end else bigtriangle_exists = 0;
+           
+        // if (((tri_shift_R10S[0][0][SIGFIG-1:SIGFIG-4] != 4'b0000) && (tri_shift_R10S[0][1][SIGFIG-1:SIGFIG-4] != 4'b0000) &&(tri_shift_R10S[1][0][SIGFIG-1:SIGFIG-4] != 4'b0000) &&(tri_shift_R10S[1][1][SIGFIG-1:SIGFIG-4] != 4'b0000) &&(tri_shift_R10S[2][0][SIGFIG-1:SIGFIG-4] != 4'b0000) &&(tri_shift_R10S[2][1][SIGFIG-1:SIGFIG-4] != 4'b0000)) 
+        //     && ((tri_shift_R10S[0][0][SIGFIG-1:SIGFIG-4] != 4'b1111) && (tri_shift_R10S[0][1][SIGFIG-1:SIGFIG-4] != 4'b1111) &&(tri_shift_R10S[1][0][SIGFIG-1:SIGFIG-4] != 4'b1111) &&(tri_shift_R10S[1][1][SIGFIG-1:SIGFIG-4] != 4'b1111) &&(tri_shift_R10S[2][0][SIGFIG-1:SIGFIG-4] != 4'b1111) &&(tri_shift_R10S[2][1][SIGFIG-1:SIGFIG-4] != 4'b1111)))begin
+        //     bigtriangle_exists = 0;
         // end
         // else begin
-        //     frontfacing = (tri_R10S[1][0] - tri_R10S[0][0]) * (tri_R10S[2][1] - tri_R10S[1][1]) < (tri_R10S[1][1] - tri_R10S[0][1]) * (tri_R10S[2][0] - tri_R10S[1][0]);;
+        //     bigtriangle_exists = 1;
         // end
+        // backfacing_1[0] = signed'(signed'(tri_shift_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]));
+        // backfacing_1[1] = signed'(signed'(tri_shift_R10S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]));
+        // backfacing_1[2] = signed'(signed'(tri_shift_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]));
+        // backfacing_1[3] = signed'(signed'(tri_shift_R10S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]));
+        // backfacing = (backfacing_1[0] * backfacing_1[1]) > (backfacing_1[2] * backfacing_1[3]);
+        // this is working
+        // backfacing = signed'((signed'(tri_shift_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]))) * signed'((signed'(tri_shift_R10S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) > signed'((signed'(tri_shift_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) * signed'((signed'(tri_shift_R10S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT])));
+
+
+        //do bit manipulation to compare the sign of the result
+        // if first term is negative and second term is positive, then the dist is negative
+        // if ((tri_shift_R10S[0][0][SIGFIG-1] ^ tri_shift_R10S[1][1][SIGFIG-1]) && (tri_shift_R10S[1][0][SIGFIG-1] == tri_shift_R10S[0][1][SIGFIG-1])) begin
+        //     less_than_0_ornot_R10H[0] = 1;
+        // end 
+        // // if positive, first term has to be positive and second term has to be negative
+        // else if ((tri_shift_R10S[0][0][SIGFIG-1] == tri_shift_R10S[1][1][SIGFIG-1]) && (tri_shift_R10S[1][0][SIGFIG-1] ^ tri_shift_R10S[0][1][SIGFIG-1])) begin
+        //     less_than_0_ornot_R10H[0] = 0;
+        // end else
+        // // do the multiplication
+        // begin
+        //     // less_than_0_ornot_R10H[0] = ((tri_shift_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0?1:0;
+        //     less_than_0_ornot_R10H[0] = ((signed'(tri_shift_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) - ((signed'(tri_shift_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0?1:0;
+        // end
+
+        // // 
+        // if ((tri_shift_R10S[1][0][SIGFIG-1] ^ tri_shift_R10S[2][1][SIGFIG-1]) && (tri_shift_R10S[2][0][SIGFIG-1] == tri_shift_R10S[1][1][SIGFIG-1])) begin
+        //     less_than_0_ornot_R10H[1] = 1;
+        // end 
+        // // if positive, first term has to be positive and second term has to be negative
+        // else if ((tri_shift_R10S[1][0][SIGFIG-1] == tri_shift_R10S[2][1][SIGFIG-1]) && (tri_shift_R10S[2][0][SIGFIG-1] ^ tri_shift_R10S[1][1][SIGFIG-1])) begin
+        //     less_than_0_ornot_R10H[1] = 0;
+        // end else
+        // // do the multiplication
+        // begin
+        //     // less_than_0_ornot_R10H[1] = ((tri_shift_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R10S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R10S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<0?1:0;
+        //     less_than_0_ornot_R10H[1] = ((signed'(tri_shift_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R10S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R10S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<0?1:0;
+        // end
+
+        // if ((tri_shift_R10S[2][0][SIGFIG-1] ^ tri_shift_R10S[0][1][SIGFIG-1]) && (tri_shift_R10S[0][0][SIGFIG-1] == tri_shift_R10S[2][1][SIGFIG-1])) begin
+        //     less_than_0_ornot_R10H[2] = 1;
+        // end 
+        // // if positive, first term has to be positive and second term has to be negative
+        // else if ((tri_shift_R10S[2][0][SIGFIG-1] == tri_shift_R10S[0][1][SIGFIG-1]) && (tri_shift_R10S[0][0][SIGFIG-1] ^ tri_shift_R10S[2][1][SIGFIG-1])) begin
+        //     less_than_0_ornot_R10H[2] = 0;
+        // end else
+        // // do the multiplication
+        // begin
+        //     // less_than_0_ornot_R10H[2] = ((tri_shift_R10S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R10S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0?1:0;
+        //     less_than_0_ornot_R10H[2] = ((signed'(tri_shift_R10S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R10S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0?1:0;
+        // end
+        // frontfacing = less_than_0_ornot_R10H[0] && less_than_0_ornot_R10H[1] && less_than_0_ornot_R10H[2];
+        
         // END CODE HERE
         // outvalid_R10H = validTri_R10H && (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
         // outvalid_R10H = (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);

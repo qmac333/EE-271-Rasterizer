@@ -127,6 +127,9 @@ module test_iterator
     logic                               next_validSamp_R14H;
     logic                               next_halt_RnnnnL;
 
+    localparam LSB_CUT = 0;
+    localparam MSB_CUT = 0;
+
     // Instantiate registers for storing these states
     dff3 #(
         .WIDTH(SIGFIG),
@@ -280,6 +283,104 @@ if(MOD_FSM == 0) begin // Using baseline FSM
         endcase
     end
 
+    logic [2:0] less_than_0_ornot_R13H;
+    logic signed [SIGFIG-1:0]       tri_shift_R13S[VERTS-1:0][1:0]; 
+    logic signed [SIGFIG-1:0]       centroid[AXIS-1:0];
+    logic frontfacing;
+    always_comb begin
+        centroid[0] = (box_R13S[0][0] + box_R13S[1][0]) >>> 1;
+        centroid[1] = (box_R13S[0][1] + box_R13S[1][1]) >>> 1;
+
+        tri_shift_R13S[0][0] = tri_R13S[0][0] - centroid[0];
+        tri_shift_R13S[0][1] = tri_R13S[0][1] - centroid[1];
+        tri_shift_R13S[1][0] = tri_R13S[1][0] - centroid[0];
+        tri_shift_R13S[1][1] = tri_R13S[1][1] - centroid[1];
+        tri_shift_R13S[2][0] = tri_R13S[2][0] - centroid[0];
+        tri_shift_R13S[2][1] = tri_R13S[2][1] - centroid[1];
+
+        // // if ((tri_R13S[1][0] - tri_R13S[0][0])[SIGFIG-1] ^ (tri_R13S[2][1] - tri_R13S[1][1])[SIGFIG-1]) && ((tri_R13S[1][1] - tri_R13S[0][1])[SIGFIG-1] == (tri_R13S[2][0] - tri_R13S[1][0])[SIGFIG-1]) begin  
+        // //     frontfacing = 1;
+        // // end
+        // // else if ((tri_R13S[1][0] - tri_R13S[0][0])[SIGFIG-1] == (tri_R13S[2][1] - tri_R13S[1][1])[SIGFIG-1]) && ((tri_R13S[1][1] - tri_R13S[0][1])[SIGFIG-1] ^ (tri_R13S[2][0] - tri_R13S[1][0])[SIGFIG-1]) begin
+        // //     frontfacing = 1;
+        // // end
+        // // else begin
+        // //     frontfacing = (tri_R13S[1][0] - tri_R13S[0][0]) * (tri_R13S[2][1] - tri_R13S[1][1]) < (tri_R13S[1][1] - tri_R13S[0][1]) * (tri_R13S[2][0] - tri_R13S[1][0]);;
+        // // end
+
+        
+        // top4bits[0] = tri_shift_R13S[0][0][SIGFIG-1:SIGFIG-4];
+        // top4bits[1] = tri_shift_R13S[0][1][SIGFIG-1:SIGFIG-4];
+        // top4bits[2] = tri_shift_R13S[1][0][SIGFIG-1:SIGFIG-4];
+        // top4bits[3] = tri_shift_R13S[1][1][SIGFIG-1:SIGFIG-4];
+        // top4bits[4] = tri_shift_R13S[2][0][SIGFIG-1:SIGFIG-4];
+        // top4bits[5] = tri_shift_R13S[2][1][SIGFIG-1:SIGFIG-4];
+        // if ((top4bits[0] != 4'h0) && (top4bits[0] != 4'hf))  bigtriangle_exists = 1;
+        // else bigtriangle_exists = 0;
+        // if (tri_shift_R13S[0][0][SIGFIG-4 +: 4] != 4'b0000 || (tri_shift_R13S[0][0][SIGFIG-4 +: 4] != 4'b1111)) begin
+        //     bigtriangle_exists = 1;
+        // end else bigtriangle_exists = 0;
+           
+        // if (((tri_shift_R13S[0][0][SIGFIG-1:SIGFIG-4] != 4'b0000) && (tri_shift_R13S[0][1][SIGFIG-1:SIGFIG-4] != 4'b0000) &&(tri_shift_R13S[1][0][SIGFIG-1:SIGFIG-4] != 4'b0000) &&(tri_shift_R13S[1][1][SIGFIG-1:SIGFIG-4] != 4'b0000) &&(tri_shift_R13S[2][0][SIGFIG-1:SIGFIG-4] != 4'b0000) &&(tri_shift_R13S[2][1][SIGFIG-1:SIGFIG-4] != 4'b0000)) 
+        //     && ((tri_shift_R13S[0][0][SIGFIG-1:SIGFIG-4] != 4'b1111) && (tri_shift_R13S[0][1][SIGFIG-1:SIGFIG-4] != 4'b1111) &&(tri_shift_R13S[1][0][SIGFIG-1:SIGFIG-4] != 4'b1111) &&(tri_shift_R13S[1][1][SIGFIG-1:SIGFIG-4] != 4'b1111) &&(tri_shift_R13S[2][0][SIGFIG-1:SIGFIG-4] != 4'b1111) &&(tri_shift_R13S[2][1][SIGFIG-1:SIGFIG-4] != 4'b1111)))begin
+        //     bigtriangle_exists = 0;
+        // end
+        // else begin
+        //     bigtriangle_exists = 1;
+        // end
+        // backfacing_1[0] = signed'(signed'(tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]));
+        // backfacing_1[1] = signed'(signed'(tri_shift_R13S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]));
+        // backfacing_1[2] = signed'(signed'(tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]));
+        // backfacing_1[3] = signed'(signed'(tri_shift_R13S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]));
+        // backfacing = (backfacing_1[0] * backfacing_1[1]) > (backfacing_1[2] * backfacing_1[3]);
+        // this is working
+        // backfacing = signed'((signed'(tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]))) * signed'((signed'(tri_shift_R13S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) > signed'((signed'(tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) * signed'((signed'(tri_shift_R13S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT])));
+
+
+        //do bit manipulation to compare the sign of the result
+        // if first term is negative and second term is positive, then the dist is negative
+        if ((tri_shift_R13S[0][0][SIGFIG-1] ^ tri_shift_R13S[1][1][SIGFIG-1]) && (tri_shift_R13S[1][0][SIGFIG-1] == tri_shift_R13S[0][1][SIGFIG-1])) begin
+            less_than_0_ornot_R13H[0] = 1;
+        end 
+        // if positive, first term has to be positive and second term has to be negative
+        else if ((tri_shift_R13S[0][0][SIGFIG-1] == tri_shift_R13S[1][1][SIGFIG-1]) && (tri_shift_R13S[1][0][SIGFIG-1] ^ tri_shift_R13S[0][1][SIGFIG-1])) begin
+            less_than_0_ornot_R13H[0] = 0;
+        end else
+        // do the multiplication
+        begin
+            // less_than_0_ornot_R13H[0] = ((tri_shift_R13S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0?1:0;
+            less_than_0_ornot_R13H[0] = ((signed'(tri_shift_R13S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) - ((signed'(tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R13S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0?1:0;
+        end
+
+        // 
+        if ((tri_shift_R13S[1][0][SIGFIG-1] ^ tri_shift_R13S[2][1][SIGFIG-1]) && (tri_shift_R13S[2][0][SIGFIG-1] == tri_shift_R13S[1][1][SIGFIG-1])) begin
+            less_than_0_ornot_R13H[1] = 1;
+        end 
+        // if positive, first term has to be positive and second term has to be negative
+        else if ((tri_shift_R13S[1][0][SIGFIG-1] == tri_shift_R13S[2][1][SIGFIG-1]) && (tri_shift_R13S[2][0][SIGFIG-1] ^ tri_shift_R13S[1][1][SIGFIG-1])) begin
+            less_than_0_ornot_R13H[1] = 0;
+        end else
+        // do the multiplication
+        begin
+            // less_than_0_ornot_R13H[1] = ((tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R13S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<0?1:0;
+            less_than_0_ornot_R13H[1] = ((signed'(tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R13S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R13S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<0?1:0;
+        end
+
+        if ((tri_shift_R13S[2][0][SIGFIG-1] ^ tri_shift_R13S[0][1][SIGFIG-1]) && (tri_shift_R13S[0][0][SIGFIG-1] == tri_shift_R13S[2][1][SIGFIG-1])) begin
+            less_than_0_ornot_R13H[2] = 1;
+        end 
+        // if positive, first term has to be positive and second term has to be negative
+        else if ((tri_shift_R13S[2][0][SIGFIG-1] == tri_shift_R13S[0][1][SIGFIG-1]) && (tri_shift_R13S[0][0][SIGFIG-1] ^ tri_shift_R13S[2][1][SIGFIG-1])) begin
+            less_than_0_ornot_R13H[2] = 0;
+        end else
+        // do the multiplication
+        begin
+            // less_than_0_ornot_R13H[2] = ((tri_shift_R13S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R13S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0?1:0;
+            less_than_0_ornot_R13H[2] = ((signed'(tri_shift_R13S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R13S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R13S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R13S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0?1:0;
+        end
+        frontfacing = less_than_0_ornot_R13H[0] && less_than_0_ornot_R13H[1] && less_than_0_ornot_R13H[2];
+    end
+
     always_comb begin
         // START CODE HERE
         // first set flags
@@ -376,7 +477,7 @@ if(MOD_FSM == 0) begin // Using baseline FSM
                 next_tri_R14S = tri_R13S;
                 next_box_R14S = box_R13S;
                 next_color_R14U = color_R13U;
-                if (validTri_R13H) begin
+                if (validTri_R13H && frontfacing) begin
                     next_state_R14H = TEST_STATE;
                     next_halt_RnnnnL = 1'b0;
                     next_validSamp_R14H = 1'b1;
