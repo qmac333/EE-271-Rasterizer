@@ -97,6 +97,9 @@ module sampletest
     logic signed [(2*SHORTSF)-1:0]  dist_lg_R16S[EDGES-1:0]; // Result of x_1 * y_2 - x_2 * y_1
     logic                           hit_valid_R16H ; // Output (YOUR JOB!)
     logic signed [SIGFIG-1:0]       hit_R16S[AXIS-1:0]; // Sample position
+
+    logic signed [SIGFIG-1:0]       tri_shift_test[VERTS-1:0][1:0]; // triangle after coordinate shift
+    logic signed [SIGFIG-1:0]       centroid[1:0]; // triangle after coordinate shift
     // Signals in Access Order
 
     // Your job is to produce the value for hit_valid_R16H signal, which indicates whether a sample lies inside the triangle.
@@ -182,6 +185,8 @@ module sampletest
         begin
             less_than_0_ornot[2] = ((tri_shift_R16S[2][0] * tri_shift_R16S[0][1]) - (tri_shift_R16S[0][0] * tri_shift_R16S[2][1]))<=0?1:0;
         end
+
+
 
 
         hit_valid_R16H = validSamp_R16H && (less_than_0_ornot[0]) && (less_than_0_ornot[1]) && (less_than_0_ornot[2]);

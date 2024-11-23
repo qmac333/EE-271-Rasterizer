@@ -127,6 +127,7 @@ module test_iterator
     logic                               next_validSamp_R14H;
     logic                               next_halt_RnnnnL;
 
+
     localparam LSB_CUT = 0;
     localparam MSB_CUT = 0;
 
@@ -241,10 +242,29 @@ if(MOD_FSM == 0) begin // Using baseline FSM
     // define some helper signals
     logic signed [SIGFIG-1:0]   next_up_samp_R14S[1:0]; //If jump up, next sample
     logic signed [SIGFIG-1:0]   next_rt_samp_R14S[1:0]; //If jump right, next sample
+    logic signed [SIGFIG-1:0]   next_lt_samp_R14S[1:0]; //If jump left, next sample
     logic                       at_right_edg_R14H;      //Current sample at right edge of bbox?
     logic                       at_top_edg_R14H;        //Current sample at top edge of bbox?
+    logic                       at_bottom_edg_R14H;       //Current sample at bottom edge of bbox?   
     logic                       at_end_box_R14H;        //Current sample at end of bbox?
+    logic                       inside_tri_R14H;            //Current sample outside of triangle?
+    logic signed [SIGFIG-1:0]   tri_shift_bb[VERTS-1:0][1:0]; //Shifted triangle
+    logic [2:0]                 less_than_0_ornot_bb; //Is the sample inside the triangle?
+    logic [1:0]                 left0_right1; //If left, 0, if right, 1
+    logic                       next_tri_seen; //if we seen a triangle  
+    logic                       tri_seen; //if we seen a triangle
 
+
+
+    always_ff @(posedge clk, posedge rst) begin
+        if(rst) begin
+            next_tri_seen <= 1'b0;
+            tri_seen <= 1'b0;
+        end
+        else begin
+            tri_seen <= next_tri_seen;
+        end
+    end
     //////
     ////// First calculate the values of the helper signals using CURRENT STATES
     //////
@@ -283,10 +303,11 @@ if(MOD_FSM == 0) begin // Using baseline FSM
         endcase
     end
 
-    logic [2:0] less_than_0_ornot_R13H;
+    logic [2:0] less_than_0_ornot_bb_R13H;
     logic signed [SIGFIG-1:0]       tri_shift_R13S[VERTS-1:0][1:0]; 
     logic signed [SIGFIG-1:0]       centroid[AXIS-1:0];
     logic frontfacing;
+    logic [SIGFIG-1:0] total_frontfacing_samples;
     always_comb begin
         centroid[0] = (box_R13S[0][0] + box_R13S[1][0]) >>> 1;
         centroid[1] = (box_R13S[0][1] + box_R13S[1][1]) >>> 1;
@@ -298,15 +319,15 @@ if(MOD_FSM == 0) begin // Using baseline FSM
         tri_shift_R13S[2][0] = tri_R13S[2][0] - centroid[0];
         tri_shift_R13S[2][1] = tri_R13S[2][1] - centroid[1];
 
-        // // if ((tri_R13S[1][0] - tri_R13S[0][0])[SIGFIG-1] ^ (tri_R13S[2][1] - tri_R13S[1][1])[SIGFIG-1]) && ((tri_R13S[1][1] - tri_R13S[0][1])[SIGFIG-1] == (tri_R13S[2][0] - tri_R13S[1][0])[SIGFIG-1]) begin  
-        // //     frontfacing = 1;
-        // // end
-        // // else if ((tri_R13S[1][0] - tri_R13S[0][0])[SIGFIG-1] == (tri_R13S[2][1] - tri_R13S[1][1])[SIGFIG-1]) && ((tri_R13S[1][1] - tri_R13S[0][1])[SIGFIG-1] ^ (tri_R13S[2][0] - tri_R13S[1][0])[SIGFIG-1]) begin
-        // //     frontfacing = 1;
-        // // end
-        // // else begin
-        // //     frontfacing = (tri_R13S[1][0] - tri_R13S[0][0]) * (tri_R13S[2][1] - tri_R13S[1][1]) < (tri_R13S[1][1] - tri_R13S[0][1]) * (tri_R13S[2][0] - tri_R13S[1][0]);;
-        // // end
+        // if ((tri_R13S[1][0] - tri_R13S[0][0])[SIGFIG-1] ^ (tri_R13S[2][1] - tri_R13S[1][1])[SIGFIG-1]) && ((tri_R13S[1][1] - tri_R13S[0][1])[SIGFIG-1] == (tri_R13S[2][0] - tri_R13S[1][0])[SIGFIG-1]) begin  
+        //     frontfacing = 1;
+        // end
+        // else if ((tri_R13S[1][0] - tri_R13S[0][0])[SIGFIG-1] == (tri_R13S[2][1] - tri_R13S[1][1])[SIGFIG-1]) && ((tri_R13S[1][1] - tri_R13S[0][1])[SIGFIG-1] ^ (tri_R13S[2][0] - tri_R13S[1][0])[SIGFIG-1]) begin
+        //     frontfacing = 1;
+        // end
+        // else begin
+        //     frontfacing = (tri_R13S[1][0] - tri_R13S[0][0]) * (tri_R13S[2][1] - tri_R13S[1][1]) < (tri_R13S[1][1] - tri_R13S[0][1]) * (tri_R13S[2][0] - tri_R13S[1][0]);;
+        // end
 
         
         // top4bits[0] = tri_shift_R13S[0][0][SIGFIG-1:SIGFIG-4];
@@ -335,58 +356,17 @@ if(MOD_FSM == 0) begin // Using baseline FSM
         // backfacing = (backfacing_1[0] * backfacing_1[1]) > (backfacing_1[2] * backfacing_1[3]);
         // this is working
         // backfacing = signed'((signed'(tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]))) * signed'((signed'(tri_shift_R13S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) > signed'((signed'(tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) * signed'((signed'(tri_shift_R13S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT])));
-
-
-        //do bit manipulation to compare the sign of the result
-        // if first term is negative and second term is positive, then the dist is negative
-        if ((tri_shift_R13S[0][0][SIGFIG-1] ^ tri_shift_R13S[1][1][SIGFIG-1]) && (tri_shift_R13S[1][0][SIGFIG-1] == tri_shift_R13S[0][1][SIGFIG-1])) begin
-            less_than_0_ornot_R13H[0] = 1;
-        end 
-        // if positive, first term has to be positive and second term has to be negative
-        else if ((tri_shift_R13S[0][0][SIGFIG-1] == tri_shift_R13S[1][1][SIGFIG-1]) && (tri_shift_R13S[1][0][SIGFIG-1] ^ tri_shift_R13S[0][1][SIGFIG-1])) begin
-            less_than_0_ornot_R13H[0] = 0;
-        end else
-        // do the multiplication
-        begin
-            // less_than_0_ornot_R13H[0] = ((tri_shift_R13S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0?1:0;
-            less_than_0_ornot_R13H[0] = ((signed'(tri_shift_R13S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) - ((signed'(tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R13S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0?1:0;
+        // if (!backfacing) begin
+        //     total_frontfacing_samples = (box_R13S[1][0] - box_R13S[0][0] + 1)*(box_R13S[1][1] - box_R13S[0][1] + 1);
         end
-
-        // 
-        if ((tri_shift_R13S[1][0][SIGFIG-1] ^ tri_shift_R13S[2][1][SIGFIG-1]) && (tri_shift_R13S[2][0][SIGFIG-1] == tri_shift_R13S[1][1][SIGFIG-1])) begin
-            less_than_0_ornot_R13H[1] = 1;
-        end 
-        // if positive, first term has to be positive and second term has to be negative
-        else if ((tri_shift_R13S[1][0][SIGFIG-1] == tri_shift_R13S[2][1][SIGFIG-1]) && (tri_shift_R13S[2][0][SIGFIG-1] ^ tri_shift_R13S[1][1][SIGFIG-1])) begin
-            less_than_0_ornot_R13H[1] = 0;
-        end else
-        // do the multiplication
-        begin
-            // less_than_0_ornot_R13H[1] = ((tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R13S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<0?1:0;
-            less_than_0_ornot_R13H[1] = ((signed'(tri_shift_R13S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R13S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R13S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R13S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<0?1:0;
-        end
-
-        if ((tri_shift_R13S[2][0][SIGFIG-1] ^ tri_shift_R13S[0][1][SIGFIG-1]) && (tri_shift_R13S[0][0][SIGFIG-1] == tri_shift_R13S[2][1][SIGFIG-1])) begin
-            less_than_0_ornot_R13H[2] = 1;
-        end 
-        // if positive, first term has to be positive and second term has to be negative
-        else if ((tri_shift_R13S[2][0][SIGFIG-1] == tri_shift_R13S[0][1][SIGFIG-1]) && (tri_shift_R13S[0][0][SIGFIG-1] ^ tri_shift_R13S[2][1][SIGFIG-1])) begin
-            less_than_0_ornot_R13H[2] = 0;
-        end else
-        // do the multiplication
-        begin
-            // less_than_0_ornot_R13H[2] = ((tri_shift_R13S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R13S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R13S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0?1:0;
-            less_than_0_ornot_R13H[2] = ((signed'(tri_shift_R13S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R13S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R13S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R13S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0?1:0;
-        end
-        frontfacing = less_than_0_ornot_R13H[0] && less_than_0_ornot_R13H[1] && less_than_0_ornot_R13H[2];
-    end
-
     always_comb begin
         // START CODE HERE
         // first set flags
         
         at_right_edg_R14H = sample_R14S[0] == box_R14S[1][0];
+        at_left_edg_R14H = sample_R14S[0] == box_R14S[0][0];
         at_top_edg_R14H = sample_R14S[1] == box_R14S[1][1];
+        at_bottom_edg_R14H = sample_R14S[1] == box_R14S[0][1];
         at_end_box_R14H = ((sample_R14S[0] == box_R14S[1][0]) && (sample_R14S[1] == box_R14S[1][1]));
 
         // set next_sample_up and next_sample_rt
@@ -394,6 +374,12 @@ if(MOD_FSM == 0) begin // Using baseline FSM
         next_up_samp_R14S[1] = sample_R14S[1] + increment;
         next_rt_samp_R14S[0] = sample_R14S[0] + increment;
         next_rt_samp_R14S[1] = sample_R14S[1];
+        next_lt_samp_R14S[0] = sample_R14S[0] - increment;
+        next_lt_samp_R14S[1] = sample_R14S[1];
+        next_up_left_samp_R14S[0] = sample_R14S[0] - increment;
+        next_up_left_samp_R14S[1] = sample_R14S[1] + increment;
+        next_up_rt_samp_R14S[0] = sample_R14S[0] + increment;
+        next_up_rt_samp_R14S[1] = sample_R14S[1] + increment;
 
         // set next_sample
         // if (at_right_edg_R14H == 1'b1) begin
@@ -477,11 +463,13 @@ if(MOD_FSM == 0) begin // Using baseline FSM
                 next_tri_R14S = tri_R13S;
                 next_box_R14S = box_R13S;
                 next_color_R14U = color_R13U;
-                if (validTri_R13H && frontfacing) begin
+                if (validTri_R13H) begin
                     next_state_R14H = TEST_STATE;
                     next_halt_RnnnnL = 1'b0;
                     next_validSamp_R14H = 1'b1;
                     next_sample_R14S = box_R13S[0];
+                    left0_right1 = 1;
+                    next_tri_seen = 0;
                 end
                 else begin
                     next_state_R14H = WAIT_STATE;
@@ -506,6 +494,70 @@ if(MOD_FSM == 0) begin // Using baseline FSM
                     next_state_R14H = TEST_STATE;
                     next_halt_RnnnnL = 1'b0;
                     next_validSamp_R14H = 1'b1;
+
+                    //test if outside of triangle
+                    //if first term is negative and second term is positive, then the dist is negative
+                    if ((tri_shift_bb[0][0][SIGFIG-1] ^ tri_shift_bb[1][1][SIGFIG-1]) && (tri_shift_bb[1][0][SIGFIG-1] == tri_shift_bb[0][1][SIGFIG-1])) begin
+                        less_than_0_ornot_bb[0] = 1;
+                    end 
+                    // if positive, first term has to be positive and second term has to be negative
+                    else if ((tri_shift_bb[0][0][SIGFIG-1] == tri_shift_bb[1][1][SIGFIG-1]) && (tri_shift_bb[1][0][SIGFIG-1] ^ tri_shift_bb[0][1][SIGFIG-1])) begin
+                        less_than_0_ornot_bb[0] = 0;
+                    end else
+                    // do the multiplication
+                    begin
+                        less_than_0_ornot_bb[0] = ((tri_shift_bb[0][0] * tri_shift_bb[1][1]) - (tri_shift_bb[1][0] * tri_shift_bb[0][1]))<=0?1:0;
+                    end
+
+                    // 
+                    if ((tri_shift_bb[1][0][SIGFIG-1] ^ tri_shift_bb[2][1][SIGFIG-1]) && (tri_shift_bb[2][0][SIGFIG-1] == tri_shift_bb[1][1][SIGFIG-1])) begin
+                        less_than_0_ornot_bb[1] = 1;
+                    end 
+                    // if positive, first term has to be positive and second term has to be negative
+                    else if ((tri_shift_bb[1][0][SIGFIG-1] == tri_shift_bb[2][1][SIGFIG-1]) && (tri_shift_bb[2][0][SIGFIG-1] ^ tri_shift_bb[1][1][SIGFIG-1])) begin
+                        less_than_0_ornot_bb[1] = 0;
+                    end else
+                    // do the multiplication
+                    begin
+                        less_than_0_ornot_bb[1] = ((tri_shift_bb[1][0] * tri_shift_bb[2][1]) - (tri_shift_bb[2][0] * tri_shift_bb[1][1]))<0?1:0;
+                    end
+
+                    if ((tri_shift_bb[2][0][SIGFIG-1] ^ tri_shift_bb[0][1][SIGFIG-1]) && (tri_shift_bb[0][0][SIGFIG-1] == tri_shift_bb[2][1][SIGFIG-1])) begin
+                        less_than_0_ornot_bb[2] = 1;
+                    end 
+                    // if positive, first term has to be positive and second term has to be negative
+                    else if ((tri_shift_bb[2][0][SIGFIG-1] == tri_shift_bb[0][1][SIGFIG-1]) && (tri_shift_bb[0][0][SIGFIG-1] ^ tri_shift_bb[2][1][SIGFIG-1])) begin
+                        less_than_0_ornot_bb[2] = 0;
+                    end else
+                    // do the multiplication
+                    begin
+                        less_than_0_ornot_bb[2] = ((tri_shift_bb[2][0] * tri_shift_bb[0][1]) - (tri_shift_bb[0][0] * tri_shift_bb[2][1]))<=0?1:0;
+                    end
+
+                    inside_tri_R14H = (less_than_0_ornot_bb[0]) && (less_than_0_ornot_bb[1]) && (less_than_0_ornot_bb[2]);
+                    
+                    if (inside_tri_R14H && !tri_seen) next_tri_seen = 1;
+                    else next_tri_seen = 0;
+
+
+
+                    if (at_bottom_edg_R14H && !tri_seen) begin
+                        left0_right1 = 1;
+                        next_sample_R14S = next_rt_samp_R14S;
+                    end
+                    else if (at_bottom_edg_R14H && inside_tri_R14H) begin
+                        left0_right1 = 1;
+                        next_sample_R14S = next_rt_samp_R14S
+                    end
+                    else if (at_bottom_edg_R14H && !inside_tri_R14H && tri_seen) begin
+                        left0_right1 = 0;
+                        next_sample_R14S = next_up_left_samp_R14S;
+                    end
+
+
+
+
+                    
                     if (at_right_edg_R14H) begin
                         next_sample_R14S = next_up_samp_R14S;
                     end
