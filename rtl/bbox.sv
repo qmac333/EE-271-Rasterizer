@@ -343,15 +343,15 @@ endgenerate
     // Invalid if BBox is up/right of Screen
     // Invalid if BBox is down/left of Screen
     // outvalid_R10H high if validTri_R10H && BBox is valid
-    logic frontfacing;
-    logic signed [SIGFIG-1:0] centroid[1:0];
-    logic signed [SIGFIG-1:0]       tri_shift_R10S[VERTS-1:0][1:0]; // triangle after coordinate shift
-    logic [2:0] less_than_0_ornot_R10H;
+    // logic frontfacing;
+    // logic signed [SIGFIG-1:0] centroid[1:0];
+    // logic signed [SIGFIG-1:0]       tri_shift_R10S[VERTS-1:0][1:0]; // triangle after coordinate shift
+    // logic [2:0] less_than_0_ornot_R10H;
     logic backfacing;
-    logic signed [SIGFIG-MSB_CUT-1:LSB_CUT]   backfacing_1 [3:0];
-    logic bigtriangle_exists;
-    logic signed [3:0] top4bits[5:0];
-    // assign backfacing = (signed'(tri_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_R10S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])) > (signed'(tri_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_R10S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]));
+    // logic signed [SIGFIG-MSB_CUT-1:LSB_CUT]   backfacing_1 [3:0];
+    // logic bigtriangle_exists;
+    // logic signed [3:0] top4bits[5:0];
+    assign backfacing = (signed'(tri_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_R10S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])) > (signed'(tri_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_R10S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]));
     always_comb begin
 
         //////// ASSIGN "out_box_R10S" and "outvalid_R10H"
@@ -486,9 +486,10 @@ endgenerate
         // outvalid_R10H = (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
         // outvalid_R10H = (!backfacing && (out_box_R10S[0][0] >= 0) && (out_box_R10S[0][1] >= 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]));
         // outvalid_R10H = ((out_box_R10S[0][0][SIGFIG-1] == 0) && (out_box_R10S[0][1][SIGFIG-1] == 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]));
-        // outvalid_R10H = validTri_R10H && !backfacing;
+        outvalid_R10H = validTri_R10H && !backfacing;
         // outvalid_R10H = validTri_R10H && frontfacing;
-        outvalid_R10H = validTri_R10H;
+        // outvalid_R10H = validTri_R10H;
+        // outvalid_R10H = (out_box_R10S[0][0] >= 0) && (out_box_R10S[0][1] >= 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]);
 
     end
 
