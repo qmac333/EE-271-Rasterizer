@@ -85,7 +85,7 @@ module sampletest
     localparam SHORTSF = SIGFIG;
     localparam MROUND = (2 * SHORTSF) - RADIX;
     localparam LSB_CUT = 0; //bits being cut out
-    localparam MSB_CUT = 8;
+    localparam MSB_CUT = 11;
 
     // output for retiming registers
     logic signed [SIGFIG-1:0]       hit_R18S_retime[AXIS-1:0];   // Hit Location

@@ -237,7 +237,7 @@ $(DEBUG_LIBRARY): $(VERILOG_FILES)
 DESIGN_TARGET = rast
 
 # The target clock period and area in library units (nS) (um^2). 45 
-CLK_PERIOD=1.2; 
+CLK_PERIOD=1.0836; 
 TARGET_AREA=42000;
 
 
@@ -282,6 +282,19 @@ CPP_OBJ = $(CPP_SRC:.cpp=.o)
 ################################################################################
 #default rule: 
 all: $(EXECUTABLE)
+
+# .PHONY: synth
+# synth: clean
+# 	mkdir -p reports outputs
+# 	dc_shell -f synthesis.tcl |& tee reports/synthesis.log
+# 	rm -f  *.log
+# 	rm -f  default.svf
+# 	rm -rf work
+# 	bash check_synth_error.sh
+
+.PHONY: dv
+dv:
+	design_vision -f dc-gui.tcl
 
 # submission
 submission: cleanall

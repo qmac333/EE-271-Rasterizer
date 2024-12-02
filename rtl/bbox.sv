@@ -141,7 +141,7 @@ module bbox
 );
 
     localparam LSB_CUT = 0; //bits being cut out
-    localparam MSB_CUT = 0;
+    localparam MSB_CUT = 11;
     //Signals In Clocking Order
 
     //Begin R10 Signals
@@ -349,9 +349,15 @@ endgenerate
     // logic [2:0] less_than_0_ornot_R10H;
     logic backfacing;
     // logic signed [SIGFIG-MSB_CUT-1:LSB_CUT]   backfacing_1 [3:0];
+    // logic signed [(2*SIGFIG)-1:0]  dist_lg_R10S[2:0]; // Result of x_1 * y_2 - x_2 * y_1
     // logic bigtriangle_exists;
     // logic signed [3:0] top4bits[5:0];
-    assign backfacing = (signed'(tri_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_R10S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])) > (signed'(tri_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_R10S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]));
+    // assign backfacing = (signed'(tri_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_R10S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])) > (signed'(tri_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_R10S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]));
+    logic signed [(SIGFIG)-1:0] backfacing_int[3:0];
+    logic signed [SIGFIG-MSB_CUT-1:LSB_CUT] backfacing_crossprod[3:0];
+    logic signed [(SIGFIG)-1:0] backfacing_idk;
+    // assign backfacing = ((signed'(tri_R10S[1][0]) - signed'(tri_R10S[0][0]))[SIGFIG-MSB_CUT-1:LSB_CUT]) * ((signed'(tri_R10S[2][1]) - signed'(tri_R10S[1][1]))[SIGFIG-MSB_CUT-1:LSB_CUT]) > ((signed'(tri_R10S[1][1]) - signed'(tri_R10S[0][1]))[SIGFIG-MSB_CUT-1:LSB_CUT]) * ((signed'(tri_R10S[2][0]) - signed'(tri_R10S[1][0]))[SIGFIG-MSB_CUT-1:LSB_CUT]);
+
     always_comb begin
 
         //////// ASSIGN "out_box_R10S" and "outvalid_R10H"
@@ -398,6 +404,23 @@ endgenerate
         // tri_shift_R10S[1][1] = tri_R10S[1][1] - centroid[1];
         // tri_shift_R10S[2][0] = tri_R10S[2][0] - centroid[0];
         // tri_shift_R10S[2][1] = tri_R10S[2][1] - centroid[1];
+
+        // dist_lg_R10S[0] = (tri_shift_R10S[0][0] * tri_shift_R10S[1][1]) - (tri_shift_R10S[1][0] * tri_shift_R10S[0][1]);
+        // dist_lg_R10S[1] = (tri_shift_R10S[1][0] * tri_shift_R10S[2][1]) - (tri_shift_R10S[2][0] * tri_shift_R10S[1][1]);
+        // dist_lg_R10S[2] = (tri_shift_R10S[2][0] * tri_shift_R10S[0][1]) - (tri_shift_R10S[0][0] * tri_shift_R10S[2][1]);
+
+        // frontfacing = (dist_lg_R10S[0] <= 0) && (dist_lg_R10S[1] < 0) && (dist_lg_R10S[2] <= 0);
+
+        backfacing_int[0] = (tri_R10S[1][0] - tri_R10S[0][0]);
+        backfacing_int[1] = (tri_R10S[2][1] - tri_R10S[1][1]);
+        backfacing_int[2] = (tri_R10S[1][1] - tri_R10S[0][1]);
+        backfacing_int[3] = (tri_R10S[2][0] - tri_R10S[1][0]);
+        backfacing_crossprod[3] = backfacing_int[3][SIGFIG-MSB_CUT-1:LSB_CUT];
+        backfacing_crossprod[2] = backfacing_int[2][SIGFIG-MSB_CUT-1:LSB_CUT];
+        backfacing_crossprod[1] = backfacing_int[1][SIGFIG-MSB_CUT-1:LSB_CUT];
+        backfacing_crossprod[0] = backfacing_int[0][SIGFIG-MSB_CUT-1:LSB_CUT];
+        backfacing_idk = (backfacing_crossprod[0] * backfacing_crossprod[1]) - (backfacing_crossprod[2] * backfacing_crossprod[3]);
+        // backfacing = (backfacing_int[0][SIGFIG-MSB_CUT-1:LSB_CUT] * backfacing_int[1][SIGFIG-MSB_CUT-1:LSB_CUT]) > (backfacing_int[2][SIGFIG-MSB_CUT-1:LSB_CUT] * backfacing_int[3][SIGFIG-MSB_CUT-1:LSB_CUT]);
 
         // // if ((tri_R10S[1][0] - tri_R10S[0][0])[SIGFIG-1] ^ (tri_R10S[2][1] - tri_R10S[1][1])[SIGFIG-1]) && ((tri_R10S[1][1] - tri_R10S[0][1])[SIGFIG-1] == (tri_R10S[2][0] - tri_R10S[1][0])[SIGFIG-1]) begin  
         // //     frontfacing = 1;
@@ -453,7 +476,6 @@ endgenerate
         //     less_than_0_ornot_R10H[0] = ((signed'(tri_shift_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) - ((signed'(tri_shift_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0?1:0;
         // end
 
-        // // 
         // if ((tri_shift_R10S[1][0][SIGFIG-1] ^ tri_shift_R10S[2][1][SIGFIG-1]) && (tri_shift_R10S[2][0][SIGFIG-1] == tri_shift_R10S[1][1][SIGFIG-1])) begin
         //     less_than_0_ornot_R10H[1] = 1;
         // end 
@@ -486,7 +508,9 @@ endgenerate
         // outvalid_R10H = (out_box_R10S[0][0] < out_box_R10S[1][0]) && (out_box_R10S[0][1] < out_box_R10S[1][1]);
         // outvalid_R10H = (!backfacing && (out_box_R10S[0][0] >= 0) && (out_box_R10S[0][1] >= 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]));
         // outvalid_R10H = ((out_box_R10S[0][0][SIGFIG-1] == 0) && (out_box_R10S[0][1][SIGFIG-1] == 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]));
-        outvalid_R10H = validTri_R10H && !backfacing;
+        // outvalid_R10H = validTri_R10H && (backfacing_idk < 0);
+        outvalid_R10H = validTri_R10H && (backfacing_idk[SIGFIG-1] == 1);
+
         // outvalid_R10H = validTri_R10H && frontfacing;
         // outvalid_R10H = validTri_R10H;
         // outvalid_R10H = (out_box_R10S[0][0] >= 0) && (out_box_R10S[0][1] >= 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]);
