@@ -105,6 +105,7 @@ module sampletest
     // hit_valid_R16H is high if validSamp_R16H && sample inside triangle (with back face culling)
     // Consider the following steps:
     logic [2:0] less_than_0_ornot;
+    logic signed [(2*SIGFIG)-1:0] crossproduct[3:0]; 
     // START CODE HERE
     always_comb begin
         // (1) Shift X, Y coordinates such that the fragment resides on the (0,0) position.
@@ -148,45 +149,51 @@ module sampletest
 
         //do bit manipulation to compare the sign of the result
         //if first term is negative and second term is positive, then the dist is negative
-        if ((tri_shift_R16S[0][0][SIGFIG-1] ^ tri_shift_R16S[1][1][SIGFIG-1]) && (tri_shift_R16S[1][0][SIGFIG-1] == tri_shift_R16S[0][1][SIGFIG-1])) begin
-            less_than_0_ornot[0] = 1;
-        end 
-        // if positive, first term has to be positive and second term has to be negative
-        else if ((tri_shift_R16S[0][0][SIGFIG-1] == tri_shift_R16S[1][1][SIGFIG-1]) && (tri_shift_R16S[1][0][SIGFIG-1] ^ tri_shift_R16S[0][1][SIGFIG-1])) begin
-            less_than_0_ornot[0] = 0;
-        end else
+        // if ((tri_shift_R16S[0][0][SIGFIG-1] ^ tri_shift_R16S[1][1][SIGFIG-1]) && (tri_shift_R16S[1][0][SIGFIG-1] == tri_shift_R16S[0][1][SIGFIG-1])) begin
+        //     less_than_0_ornot[0] = 1;
+        // end 
+        // // if positive, first term has to be positive and second term has to be negative
+        // else if ((tri_shift_R16S[0][0][SIGFIG-1] == tri_shift_R16S[1][1][SIGFIG-1]) && (tri_shift_R16S[1][0][SIGFIG-1] ^ tri_shift_R16S[0][1][SIGFIG-1])) begin
+        //     less_than_0_ornot[0] = 0;
+        // end else
         // do the multiplication
-        begin
-            // less_than_0_ornot[0] = ((tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0?1:0;
-            less_than_0_ornot[0] = ((signed'(tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) - ((signed'(tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0?1:0;
-        end
+        // begin
+            // less_than_0_ornot[0] = ((tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0?;
+            // crossproduct[0] = ((signed'(tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))) - ((signed'(tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])));
+            // less_than_0_ornot[0] = (crossproduct[0][(2*SIGFIG)-1] || (crossproduct[0] == 0));
+            less_than_0_ornot[0] = ((signed'(tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0;
+        // end
 
         // 
-        if ((tri_shift_R16S[1][0][SIGFIG-1] ^ tri_shift_R16S[2][1][SIGFIG-1]) && (tri_shift_R16S[2][0][SIGFIG-1] == tri_shift_R16S[1][1][SIGFIG-1])) begin
-            less_than_0_ornot[1] = 1;
-        end 
-        // if positive, first term has to be positive and second term has to be negative
-        else if ((tri_shift_R16S[1][0][SIGFIG-1] == tri_shift_R16S[2][1][SIGFIG-1]) && (tri_shift_R16S[2][0][SIGFIG-1] ^ tri_shift_R16S[1][1][SIGFIG-1])) begin
-            less_than_0_ornot[1] = 0;
-        end else
+        // if ((tri_shift_R16S[1][0][SIGFIG-1] ^ tri_shift_R16S[2][1][SIGFIG-1]) && (tri_shift_R16S[2][0][SIGFIG-1] == tri_shift_R16S[1][1][SIGFIG-1])) begin
+        //     less_than_0_ornot[1] = 1;
+        // end 
+        // // if positive, first term has to be positive and second term has to be negative
+        // else if ((tri_shift_R16S[1][0][SIGFIG-1] == tri_shift_R16S[2][1][SIGFIG-1]) && (tri_shift_R16S[2][0][SIGFIG-1] ^ tri_shift_R16S[1][1][SIGFIG-1])) begin
+        //     less_than_0_ornot[1] = 0;
+        // end else
         // do the multiplication
-        begin
-            // less_than_0_ornot[1] = ((tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<0?1:0;
-            less_than_0_ornot[1] = ((signed'(tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<0?1:0;
-        end
+        // begin
+            // less_than_0_ornot[1] = ((tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<0;
+            // crossproduct[1] = ((signed'(tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])));
+            // less_than_0_ornot[1] = crossproduct[1][(2*SIGFIG)-1];
+            less_than_0_ornot[1] = ((signed'(tri_shift_R16S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<0;
+        // end
 
-        if ((tri_shift_R16S[2][0][SIGFIG-1] ^ tri_shift_R16S[0][1][SIGFIG-1]) && (tri_shift_R16S[0][0][SIGFIG-1] == tri_shift_R16S[2][1][SIGFIG-1])) begin
-            less_than_0_ornot[2] = 1;
-        end 
-        // if positive, first term has to be positive and second term has to be negative
-        else if ((tri_shift_R16S[2][0][SIGFIG-1] == tri_shift_R16S[0][1][SIGFIG-1]) && (tri_shift_R16S[0][0][SIGFIG-1] ^ tri_shift_R16S[2][1][SIGFIG-1])) begin
-            less_than_0_ornot[2] = 0;
-        end else
+        // if ((tri_shift_R16S[2][0][SIGFIG-1] ^ tri_shift_R16S[0][1][SIGFIG-1]) && (tri_shift_R16S[0][0][SIGFIG-1] == tri_shift_R16S[2][1][SIGFIG-1])) begin
+        //     less_than_0_ornot[2] = 1;
+        // end 
+        // // if positive, first term has to be positive and second term has to be negative
+        // else if ((tri_shift_R16S[2][0][SIGFIG-1] == tri_shift_R16S[0][1][SIGFIG-1]) && (tri_shift_R16S[0][0][SIGFIG-1] ^ tri_shift_R16S[2][1][SIGFIG-1])) begin
+        //     less_than_0_ornot[2] = 0;
+        // end else
         // do the multiplication
-        begin
-            // less_than_0_ornot[2] = ((tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0?1:0;
-            less_than_0_ornot[2] = ((signed'(tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0?1:0;
-        end
+        // begin
+            // less_than_0_ornot[2] = ((tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - (tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT] * tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]))<=0;
+            // crossproduct[2] = ((signed'(tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])));
+            // less_than_0_ornot[2] = (crossproduct[2][(2*SIGFIG)-1] || (crossproduct[2] == 0));
+            less_than_0_ornot[2] = ((signed'(tri_shift_R16S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) - (signed'(tri_shift_R16S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT]) * signed'(tri_shift_R16S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT])))<=0;
+        // end
 
 
         hit_valid_R16H = validSamp_R16H && (less_than_0_ornot[0]) && (less_than_0_ornot[1]) && (less_than_0_ornot[2]);
