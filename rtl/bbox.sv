@@ -141,7 +141,8 @@ module bbox
 );
 
     localparam LSB_CUT = 0; //bits being cut out
-    localparam MSB_CUT = 11;
+    localparam MSB_CUT = 10;
+    // localparam SIGFIG_X2 = SIGFIG<<1;
     //Signals In Clocking Order
 
     //Begin R10 Signals
@@ -355,7 +356,8 @@ endgenerate
     // assign backfacing = (signed'(tri_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[0][0][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_R10S[2][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT])) > (signed'(tri_R10S[1][1][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[0][1][SIGFIG-MSB_CUT-1:LSB_CUT])) * (signed'(tri_R10S[2][0][SIGFIG-MSB_CUT-1:LSB_CUT]) - signed'(tri_R10S[1][0][SIGFIG-MSB_CUT-1:LSB_CUT]));
     logic signed [(SIGFIG)-1:0] backfacing_int[3:0];
     logic signed [SIGFIG-MSB_CUT-1:LSB_CUT] backfacing_crossprod[3:0];
-    logic signed [(SIGFIG)-1:0] backfacing_idk;
+    logic signed [(2*SIGFIG)-1:0] backfacing_idk;
+    // logic signed [(2*SIGFIG)-1:0] backfacing_00test;
     // assign backfacing = ((signed'(tri_R10S[1][0]) - signed'(tri_R10S[0][0]))[SIGFIG-MSB_CUT-1:LSB_CUT]) * ((signed'(tri_R10S[2][1]) - signed'(tri_R10S[1][1]))[SIGFIG-MSB_CUT-1:LSB_CUT]) > ((signed'(tri_R10S[1][1]) - signed'(tri_R10S[0][1]))[SIGFIG-MSB_CUT-1:LSB_CUT]) * ((signed'(tri_R10S[2][0]) - signed'(tri_R10S[1][0]))[SIGFIG-MSB_CUT-1:LSB_CUT]);
 
     always_comb begin
@@ -421,6 +423,8 @@ endgenerate
         backfacing_crossprod[0] = backfacing_int[0][SIGFIG-MSB_CUT-1:LSB_CUT];
         backfacing_idk = (backfacing_crossprod[0] * backfacing_crossprod[1]) - (backfacing_crossprod[2] * backfacing_crossprod[3]);
         // backfacing = (backfacing_int[0][SIGFIG-MSB_CUT-1:LSB_CUT] * backfacing_int[1][SIGFIG-MSB_CUT-1:LSB_CUT]) > (backfacing_int[2][SIGFIG-MSB_CUT-1:LSB_CUT] * backfacing_int[3][SIGFIG-MSB_CUT-1:LSB_CUT]);
+        // backfacing = (backfacing_int[0]*backfacing_int[1]) > (backfacing_int[2]*backfacing_int[3]);
+        // backfacing_00test = (backfacing_int[0]*backfacing_int[1]) - (backfacing_int[2]*backfacing_int[3]);
 
         // // if ((tri_R10S[1][0] - tri_R10S[0][0])[SIGFIG-1] ^ (tri_R10S[2][1] - tri_R10S[1][1])[SIGFIG-1]) && ((tri_R10S[1][1] - tri_R10S[0][1])[SIGFIG-1] == (tri_R10S[2][0] - tri_R10S[1][0])[SIGFIG-1]) begin  
         // //     frontfacing = 1;
@@ -509,9 +513,11 @@ endgenerate
         // outvalid_R10H = (!backfacing && (out_box_R10S[0][0] >= 0) && (out_box_R10S[0][1] >= 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]));
         // outvalid_R10H = ((out_box_R10S[0][0][SIGFIG-1] == 0) && (out_box_R10S[0][1][SIGFIG-1] == 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]));
         // outvalid_R10H = validTri_R10H && (backfacing_idk < 0);
-        outvalid_R10H = validTri_R10H && (backfacing_idk[SIGFIG-1] == 1);
+        outvalid_R10H = validTri_R10H && (backfacing_idk[(2*SIGFIG)-1] == 1);
+        // outvalid_R10H = validTri_R10H && (backfacing_00test < 0);
 
         // outvalid_R10H = validTri_R10H && frontfacing;
+        // outvalid_R10H = validTri_R10H && !backfacing;
         // outvalid_R10H = validTri_R10H;
         // outvalid_R10H = (out_box_R10S[0][0] >= 0) && (out_box_R10S[0][1] >= 0) && (out_box_R10S[1][0] <= screen_RnnnnS[0]) && (out_box_R10S[1][1] <= screen_RnnnnS[1]);
 
