@@ -256,22 +256,18 @@ if(MOD_FSM == 0) begin // Using baseline FSM
             4'b1000: begin
                 //1x MSAA eq. to 1 sample per pixel
                 //no rounding needed
-                // increment = 12'b010000000000;
                 increment = {1'b1, {RADIX{1'b0}}};
             end
             4'b0100: begin
                 //4x MSAA eq to 4 samples per pixel, a sample is half a pixel on a side
-                // increment = 12'b001000000000;
                 increment = {1'b1, {RADIX-1{1'b0}}};
             end
             4'b0010: begin
                 //16x MSAA eq to 16 sample per pixel, a sample is a quarter pixel on a side.
-                // increment = 12'b000100000000;
                 increment = {1'b1, {RADIX-2{1'b0}}};
             end
             4'b0001: begin
                 //64x MSAA eq to 64 samples per pixel, a sample is an eighth of a pixel on a side.
-                // increment = 12'b000010000000;
                 increment = {1'b1, {RADIX-3{1'b0}}};
             end
             default: begin
@@ -283,7 +279,6 @@ if(MOD_FSM == 0) begin // Using baseline FSM
     always_comb begin
         // START CODE HERE
         // first set flags
-        
         at_right_edg_R14H = sample_R14S[0] == box_R14S[1][0];
         at_top_edg_R14H = sample_R14S[1] == box_R14S[1][1];
         at_end_box_R14H = ((sample_R14S[0] == box_R14S[1][0]) && (sample_R14S[1] == box_R14S[1][1]));
@@ -293,70 +288,6 @@ if(MOD_FSM == 0) begin // Using baseline FSM
         next_up_samp_R14S[1] = sample_R14S[1] + increment;
         next_rt_samp_R14S[0] = sample_R14S[0] + increment;
         next_rt_samp_R14S[1] = sample_R14S[1];
-
-        // set next_sample
-        // if (at_right_edg_R14H == 1'b1) begin
-        //     next_sample_R14S = next_up_samp_R14S;
-        // end
-        // else begin
-        //     next_sample_R14S = next_rt_samp_R14S;
-        // end
-
-
-        // at_right_edg_R14H = 1'b0;
-        // at_top_edg_R14H = 1'b0;
-        // at_end_box_R14H = 1'b0;
-        // //starting point
-        // if (state_R14H == WAIT_STATE && validTri_R13H) begin
-        //     next_sample_R14S[0] = box_R13S[0][0];
-        //     next_sample_R14S[1] = box_R13S[0][1];
-        //     // next_validSamp_R14H = 1'b1;
-        // end
-        // //check if at end of box
-        // else if (state_R14H == TEST_STATE && sample_R14S[0] == box_R14S[1][0] && sample_R14S[1] == box_R14S[1][1]) begin
-        //     at_end_box_R14H = 1'b1;
-        //     // next_validSamp_R14H = 1'b0;
-        // end
-        // //check if at right edge
-        // else if (state_R14H == TEST_STATE && sample_R14S[0] == box_R14S[1][0]) begin
-        //     // next_up_samp_R14S[0] = box_R14S[0][0];
-        //     // next_up_samp_R14S[1] = sample_R14S[1] + increment;
-        //     next_sample_R14S[0] = box_R14S[0][0];
-        //     next_sample_R14S[1] = sample_R14S[1] + increment;
-        //     at_right_edg_R14H = 1'b1;
-        //     // next_validSamp_R14H = 1'b1;
-        // end
-        // //check if at top edge
-        // else if (state_R14H == TEST_STATE && sample_R14S[1] == box_R14S[1][1]) begin
-        //     // next_rt_samp_R14S[0] = sample_R14S[0] + increment;
-        //     // next_rt_samp_R14S[1] = sample_R14S[1];
-        //     // next_up_samp_R14S[0] = sample_R14S[0] + increment;
-        //     // next_up_samp_R14S[1] = sample_R14S[1];
-        //     next_sample_R14S[0] = sample_R14S[0] + increment;
-        //     next_sample_R14S[1] = sample_R14S[1];
-        //     at_top_edg_R14H = 1'b1;
-        //     // next_validSamp_R14H = 1'b1;
-        // end
-        // else begin
-        //     // next_rt_samp_R14S[0] = sample_R14S[0] + increment;
-        //     // next_rt_samp_R14S[1] = sample_R14S[1];
-        //     next_sample_R14S[0] = sample_R14S[0] + increment;
-        //     next_sample_R14S[1] = sample_R14S[1];
-        //     at_right_edg_R14H = 1'b0;
-        //     at_top_edg_R14H = 1'b0;
-        //     at_end_box_R14H = 1'b0;
-        //     // next_validSamp_R14H = 1'b1;
-        // end
-        
-
-
-        
-        
-        // if (!validTri_R13H) begin
-        //     next_validSamp_R14H = 1'b0;
-        // end
-        // next_sample_R14S[0] = next_rt_samp_R14S[0];
-        // next_sample_R14S[1] = next_up_samp_R14S[1];
         // END CODE HERE
     end
 
@@ -392,8 +323,6 @@ if(MOD_FSM == 0) begin // Using baseline FSM
                 next_tri_R14S = tri_R14S;
                 next_box_R14S = box_R14S;
                 next_color_R14U = color_R14U;
-
-                
 
                 if (at_end_box_R14H) begin
                     next_state_R14H = WAIT_STATE;
